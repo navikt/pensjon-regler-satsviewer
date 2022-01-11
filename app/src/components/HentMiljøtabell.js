@@ -11,8 +11,23 @@ class HentMiljøtabell extends React.Component {
   }
 
   componentDidMount(){
-    if(this.props.aktiv){
+    if(this.props.aktiv && this.props.valgtMiljø != 'PROD'){
       fetch('https://pensjon-regler-'+this.props.valgtMiljø+'.dev.adeo.no/aktivTabell'
+      ,{
+        headers : { 
+        'Content-Type': 'application/text',
+        'Accept': 'application/text'
+        } 
+      }   
+      )    
+      .then(res => res.text())
+      .then(
+      (result) => {
+        this.setState({displayTabell: result})
+      }
+      )
+    } else if (this.props.aktiv && this.props.valgtMiljø == 'PROD'){
+      fetch('https://pensjon-regler.intern.nav.no/aktivTabell'
       ,{
         headers : { 
         'Content-Type': 'application/text',
