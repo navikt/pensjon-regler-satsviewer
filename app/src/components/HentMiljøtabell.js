@@ -27,7 +27,7 @@ class HentMiljøtabell extends React.Component {
       }
       )
     } else if (this.props.aktiv && this.props.valgtMiljø == 'PROD'){
-      fetch('https://pensjon-regler.intern.nav.no/aktivTabell'
+      fetch('https://pensjon-regler.nais.adeo.no/aktivTabell'
       ,{
         headers : { 
         'Content-Type': 'application/text',
