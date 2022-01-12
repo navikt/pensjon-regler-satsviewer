@@ -1,4 +1,4 @@
-name: Satsviewer build and deploy
+name: Satsviewer build and deploy prod
 
 on:
   push:
@@ -37,6 +37,6 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY_PROD }}
           CLUSTER: prod-fss
-          RESOURCE: nais.yml
+          RESOURCE: nais-prod.yml
           IMAGE: ${{ env.IMAGE }}
-          TEAM: teampensjondeployer
+          TEAM: pensjondeployer
