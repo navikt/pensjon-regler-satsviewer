@@ -1,0 +1,42 @@
+name: Satsviewer build and deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+      - name: Login to Github Package Registry
+        env:
+          DOCKER_USERNAME: token
+          DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin docker.pkg.github.com
+      - name: Create Docker tag
+        run: |
+          echo "docker.pkg.github.com"/"$GITHUB_REPOSITORY"/"pensjon-regler-satsviewer" > .docker_image
+          echo "$(date "+%Y-%m-%d-%H-%M-%S")-$(git rev-parse --short HEAD)" > .docker_tag
+      - name: Build Docker image
+        run: "docker build -t $(cat .docker_image):$(cat .docker_tag) -f ./app/Dockerfile ./app"
+      - name: Push Docker image
+        run: "docker push $(cat .docker_image):$(cat .docker_tag)"
+      - name: Push latest Docker image
+        run: |
+          docker tag $(cat .docker_image):$(cat .docker_tag) $(cat .docker_image):latest
+          docker push $(cat .docker_image):latest
+          echo "IMAGE=$(cat .docker_image):$(cat .docker_tag)" >> $GITHUB_ENV
+      - name: Deploy to prod-fss
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY_PROD }}
+          CLUSTER: prod-fss
+          RESOURCE: nais.yml
+          IMAGE: ${{ env.IMAGE }}
+          TEAM: teampensjondeployer
