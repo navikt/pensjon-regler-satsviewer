@@ -153,7 +153,7 @@ class App extends React.Component {
           <DropdownMenu href = {"ProdTabeller"} name = "PROD Tabeller" list = {ProdTabeller} prevTabell = {this.state.valgtTabell} onTabellChange = {this.handleTabellChange} variant = {this.state.buttonVariant}>PROD Tabeller</DropdownMenu>
           <DropdownMenu href = {"TestTabeller"} name = "Test Tabeller" list = {TestTabeller} prevTabell = {this.state.valgtTabell} onTabellChange = {this.handleTabellChange} variant = {this.state.buttonVariant}>Test Tabeller</DropdownMenu>
           <DropdownMenu href = {"AndreTabeller"} name = "Andre Tabeller" list = {AndreTabeller} prevTabell = {this.state.valgtTabell} onTabellChange = {this.handleTabellChange} variant = {this.state.buttonVariant}>Andre Tabeller</DropdownMenu>
-          <DropdownMenu href = {"MiljøTabeller"} name = "Aktiv Tabell i Miljø" list = {["Q0","Q1","Q2","Q4","Q5","PROD"]} onTabellChange = {this.handleMiljøChange} variant = {this.state.buttonVariant}>Aktiv Tabell i Miljø</DropdownMenu>
+          <DropdownMenu href = {"MiljøTabeller"} name = "Aktiv Tabell i Miljø" list = {["T0","Q0","Q1","Q2","Q4","Q5","PROD"]} onTabellChange = {this.handleMiljøChange} variant = {this.state.buttonVariant}>Aktiv Tabell i Miljø</DropdownMenu>
         </div>
 
         <div class = "valgt-tabell">
