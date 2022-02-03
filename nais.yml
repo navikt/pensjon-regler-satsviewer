@@ -2,9 +2,9 @@ apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
   name: "pensjon-regler-satsviewer"
-  namespace: "teampensjon"
+  namespace: "pensjon-regler"
   labels:
-    team: "teampensjon"
+    team: "pensjon-regler"
   annotations:
     nais.io/read-only-file-system: "false"
 spec:

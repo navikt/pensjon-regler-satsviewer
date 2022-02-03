@@ -39,4 +39,4 @@ jobs:
           CLUSTER: dev-fss
           RESOURCE: nais.yml
           IMAGE: ${{ env.IMAGE }}
-          TEAM: teampensjon
+          TEAM: pensjon-regler

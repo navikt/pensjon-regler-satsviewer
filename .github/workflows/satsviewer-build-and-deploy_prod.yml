@@ -39,4 +39,4 @@ jobs:
           CLUSTER: prod-fss
           RESOURCE: nais-prod.yml
           IMAGE: ${{ env.IMAGE }}
-          TEAM: pensjondeployer
+          TEAM: pensjon-regler
