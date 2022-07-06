@@ -12,8 +12,8 @@ class Satsheader extends React.Component {
 
     render(){
         return(
-        <div class = "sats-header" style={{cursor: 'pointer'}}>
-            <div style={{width: '1%'}}>{this.props.show ? <i class="arrow down"></i> : <i class = "arrow right"></i>}</div>
+        <div className = "sats-header" style={{cursor: 'pointer'}}>
+            <div style={{width: '1%'}}>{this.props.show ? <i className="arrow down"></i> : <i className = "arrow right"></i>}</div>
             <div style={{width: '96%'}}>{this.props.headline}</div>
         </div>
         );

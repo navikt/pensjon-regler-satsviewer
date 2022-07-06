@@ -11,7 +11,7 @@ class HentMiljøtabell extends React.Component {
   }
 
   componentDidMount(){
-    if(this.props.aktiv && this.props.valgtMiljø != 'PROD'){
+    if(this.props.aktiv && this.props.valgtMiljø !== 'PROD'){
       fetch('https://pensjon-regler-'+this.props.valgtMiljø+'.dev.adeo.no/aktivTabell'
       ,{
         headers : { 
@@ -26,7 +26,7 @@ class HentMiljøtabell extends React.Component {
         this.setState({displayTabell: result})
       }
       )
-    } else if (this.props.aktiv && this.props.valgtMiljø == 'PROD'){
+    } else if (this.props.aktiv && this.props.valgtMiljø === 'PROD'){
       fetch('https://pensjon-regler.intern.nav.no/aktivTabell'
       ,{
         headers : { 
