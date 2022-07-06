@@ -57,7 +57,7 @@ class SkjermingstilleggTabell extends React.Component {
         <tbody className = "tabell-body"> 
         {this.state.verdier.map((data,key) => {
             return(
-                    <tr>
+                    <tr key = {key}>
                     <td>{((data.satsFom[0]) < 0) ? 'N/A' : (data.satsFom[2]+'-'+data.satsFom[1]+'-'+data.satsFom[0])}</td>
                     <td>{((data.satsTom[0]) > 10000) ? 'N/A' : (data.satsTom[2]+'-'+data.satsTom[1]+'-'+data.satsTom[0])}</td>
                     <td>{data.value}</td>
