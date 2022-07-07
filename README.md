@@ -29,6 +29,11 @@ og satstabell-kategori komponentene.
 
 Under satstabell-kategori komponentene ligger de respektive satstabellene.  
 
+## Bygg & Deploy  
+Ved push til main branchen vil det automatisk settes i gang bygg & deploy jobber både til  
+dev-fss og prod-fss.  
+Workflow-filene ligger under `<repo-root>/.github/workflows`
+
 ## Intern Informasjonsflyt
 
 I det applikasjonen åpnes gjøres et kall til  
