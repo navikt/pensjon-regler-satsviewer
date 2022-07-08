@@ -38,7 +38,8 @@ class App extends React.Component {
     this.setTheme = this.setTheme.bind(this);
   }
 
-  setTheme(theme) {
+  /* metode for å endre theme, endrer variabler i App.css i henhold til valgt theme */
+  setTheme(theme) { 
     if (theme === "light") {
       document.documentElement.style.setProperty("--background", "#e0e0e0");
       document.documentElement.style.setProperty("--border", "#c9c5c5");
@@ -79,6 +80,9 @@ class App extends React.Component {
       console.log(this.state.buttonVariant);
     }
   }
+
+  /* Metode som kjører i det applikasjonen starter, gjør et api-kall til pensjon-regler for å hente alle tabeller 
+  før disse blir sortert og sendt videre til dropdown meny komponenter */
   componentDidMount() {
     fetch('https://pensjon-regler-q4.dev.adeo.no/alleSatstabeller'
       , {
@@ -118,14 +122,17 @@ class App extends React.Component {
             error
           });
         }
-      ) //TODO vil helst ha dette i en egen metode
+      )
   }
 
+  /* Metode for å endre valgt tabell, sendes som parameter til dropdown menyene for å gjøre det mulig å endre tabell 
+  i app komponenten fra underkomponenter */
   handleTabellChange(name) {
     this.setState({ valgtTabell: name, valgtMiljø: 'Q4', aktiv: false, displayTabell: name })
   }
 
-
+/* Metode for å endre valgt miljø, sendes som parameter til dropdown menyene for å gjøre det mulig å endre miljø 
+  i app komponenten fra underkomponenter */
   handleMiljøChange(name) {
     this.setState({ valgtMiljø: name, aktiv: true, displayTabell: name })
   }
@@ -133,6 +140,7 @@ class App extends React.Component {
   render() {
     return (
       <div className="App">
+
         <div className="top-bar">
           <div>{<img src={this.state.logo} alt="Logo" width="350" height="200" />}</div>
           <div className="headline"> PENSJON REGLER SATSVIEWER  </div>
@@ -143,8 +151,6 @@ class App extends React.Component {
             <button className="bubblegum-theme-button" onClick={() => this.setTheme("bubblegum")}></button>
           </div>
         </div>
-
-
 
         <div className="menu-container" >
           <DropdownMenu href={"ProdTabeller"} name="PROD Tabeller" list={ProdTabeller} prevTabell={this.state.valgtTabell} onTabellChange={this.handleTabellChange} variant={this.state.buttonVariant}>PROD Tabeller</DropdownMenu>
@@ -157,14 +163,16 @@ class App extends React.Component {
           <HentMiljøtabell key={"miljøtabell: " + this.state.displayTabell} aktiv={this.state.aktiv} displayTabell={this.state.displayTabell} valgtMiljø={this.state.valgtMiljø}></HentMiljøtabell>
         </div>
 
+        {/*Wrapper klasse for satstabeller*/}
         <div className="satsvindu-container">
           <Satsvindu currentTabell={this.state.valgtTabell} valgtMiljø={this.state.valgtMiljø} aktiv={this.state.aktiv} displayTabell={this.state.displayTabell}></Satsvindu>
         </div>
 
         <div className="app-footer" height='15%'></div>
+
       </div>
     );
   }
 }
-ReactDOM.render(App,document.getElementById('root'))
+ReactDOM.render(App, document.getElementById('root'))
 export default App;

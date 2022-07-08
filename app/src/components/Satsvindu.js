@@ -58,11 +58,13 @@ class Satsvindu extends React.Component {
 
     render() {
 
+        /* Komponent som holder alle satstabellene under kategorien 'Generelt' */
         const Generelt = () => {
             return (
                 <div className="kategori-container">
                     <div className="kategori-delimiter" style={{ width: '5%' }}></div>
                     <div className="sats-container" style={{ width: '95%' }}>
+
                         <GrunnbeløpTabell
                             key={"Grunnbeløp: " + this.props.currentTabell + this.props.valgtMiljø + this.props.aktiv}
                             currentTabell={this.props.currentTabell}
@@ -95,11 +97,13 @@ class Satsvindu extends React.Component {
             );
         }
 
+        /* Komponent som holder alle satstabellene under kategorien 'Alderspensjon1967' */
         const Alderspensjon1967 = () => {
             return (
                 <div className="kategori-container">
                     <div className="kategori-delimiter" style={{ width: '5%' }}></div>
                     <div className="sats-container" style={{ width: '95%' }}>
+                        
                         <GrunnpensjonTabell
                             key={"Grunnpensjon: " + this.props.currentTabell + this.props.valgtMiljø + this.props.aktiv}
                             currentTabell={this.props.currentTabell}
@@ -119,11 +123,11 @@ class Satsvindu extends React.Component {
             );
         }
 
+        /* Komponent som holder alle satstabellene under kategorien 'Alderspensjon2011' */
         const Alderspensjon2011 = () => {
             return (
                 <div className="kategori-container">
                     <div className="kategori-delimiter" style={{ width: '5%' }}></div>
-
                     <div className="sats-container" style={{ width: '95%' }}>
 
                         <MinstePensjonsnivåTabell
@@ -152,11 +156,11 @@ class Satsvindu extends React.Component {
             );
         }
 
+        /* Komponent som holder alle satstabellene under kategorien 'Uføretrygd' */
         const Uføretrygd = () => {
             return (
                 <div className="kategori-container">
                     <div className="kategori-delimiter" style={{ width: '5%' }}></div>
-
                     <div className="sats-container" style={{ width: '95%' }}>
 
                         <UføretrygdMinsteytelseTabell
@@ -185,11 +189,11 @@ class Satsvindu extends React.Component {
             );
         }
 
+        /* Komponent som holder alle satstabellene under kategorien 'Konvensjonsland' */
         const Konvensjonsland = () => {
             return (
                 <div className="kategori-container">
                     <div className="kategori-delimiter" style={{ width: '5%' }}></div>
-
                     <div className="sats-container" style={{ width: '95%' }}>
 
                         <NordiskKonvensjonslandTabell
@@ -213,6 +217,7 @@ class Satsvindu extends React.Component {
         return (
             <div className="satstabell-container">
 
+                {/* Wrapper komponent som styrer visning av 'Generelt' komponenten via showGenerelt variabelen */}
                 <div className="tabell-wrapper">
                     <div onClick={this.handleClickGenerelt}>
                         <Satsheader headline="Generelt" show={this.state.showGenerelt}></Satsheader>
@@ -220,6 +225,7 @@ class Satsvindu extends React.Component {
                     {this.state.showGenerelt ? <Generelt></Generelt> : null}
                 </div>
 
+                {/* Wrapper komponent som styrer visning av 'Alderspensjon1967' komponenten via showAlderspensjon1967 variabelen */}
                 <div className="tabell-wrapper">
                     <div onClick={this.handleClickAlderspensjon1967}>
                         <Satsheader headline="Alderspensjon1967" show={this.state.showAlderspensjon1967}></Satsheader>
@@ -227,6 +233,7 @@ class Satsvindu extends React.Component {
                     {this.state.showAlderspensjon1967 ? <Alderspensjon1967></Alderspensjon1967> : null}
                 </div>
 
+                {/* Wrapper komponent som styrer visning av 'Alderspensjon2011' komponenten via showAlderspensjon2011 variabelen */}
                 <div className="tabell-wrapper">
                     <div onClick={this.handleClickAlderspensjon2011}>
                         <Satsheader headline="Alderspensjon2011" show={this.state.showAlderspensjon2011}></Satsheader>
@@ -234,6 +241,7 @@ class Satsvindu extends React.Component {
                     {this.state.showAlderspensjon2011 ? <Alderspensjon2011></Alderspensjon2011> : null}
                 </div>
 
+                {/* Wrapper komponent som styrer visning av 'Uføretrygd' komponenten via showUføretrygd variabelen */}
                 <div className="tabell-wrapper">
                     <div onClick={this.handleClickUføretrygd}>
                         <Satsheader headline="Uføretrygd" show={this.state.showUføretrygd}></Satsheader>
@@ -241,6 +249,7 @@ class Satsvindu extends React.Component {
                     {this.state.showUføretrygd ? <Uføretrygd></Uføretrygd> : null}
                 </div>
 
+                {/* Wrapper komponent som styrer visning av 'Konvensjonsland' komponenten via showKonvensjonsland variabelen */}
                 <div className="tabell-wrapper">
                     <div onClick={this.handleClickKonvensjonsland}>
                         <Satsheader headline="Konvensjonsland" show={this.state.showKonvensjonsland}></Satsheader>
