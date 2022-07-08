@@ -37,7 +37,7 @@ Workflow-filene ligger under `<repo-root>/.github/workflows`
 ## Intern Informasjonsflyt
 
 I det applikasjonen åpnes gjøres et kall til  
->'https://pensjon-regler-q4.dev.adeo.no/alleSatstabeller'  
+>https://pensjon-regler-q4.dev.adeo.no/alleSatstabeller 
   
 for å hente en liste over alle tilgjengelige satstabeller. Disse blir så sortert for så å bli  
 brukt til å populere satstabell menyene.  
@@ -50,4 +50,18 @@ Dette kan endres ved å velge en av tabellene i de tre tabell menyene, eller å 
 applikasjonen mot et annet miljø.  
 Måten dette settes på er ved at i `app.js` sendes det en funksjon som kan endre denne verdien  
 med i konstruktøren til hver av meny knappene. Dette gir disse mulighet til å endre   
-denne verdien for hele applikasjonen.
+denne verdien for hele applikasjonen.  
+
+## Utvikling  
+
+Dersom det legges til et nytt felt i en eksisterende tabell må dette også legges til 
+i Satsviewer. Man må da inn i den respektive satskomponenten sin Render funksjon og legge til  
+feltnavnet som en ny tabellheader  
+`<th>Feltnavn</th>`  
+deretter må dataene legges inn i tabell-body  
+`<td>data.feltnavn</td>`  
+
+Dersom det lages en ny satstabell må denne eksponeres via et nytt endepunkt i  
+pensjon-regler 
+sin `HentSatsController`.  
+Deretter må det lages en ny tabell i Satsviewer på samme måte som andre tabeller er blitt laget
