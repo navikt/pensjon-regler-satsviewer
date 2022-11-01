@@ -37,7 +37,7 @@ Workflow-filene ligger under `<repo-root>/.github/workflows`
 ## Intern Informasjonsflyt
 
 I det applikasjonen åpnes gjøres et kall til  
->https://pensjon-regler-q4.dev.adeo.no/alleSatstabeller 
+>https://pensjon-regler-q2.dev.adeo.no/alleSatstabeller 
   
 for å hente en liste over alle tilgjengelige satstabeller. Disse blir så sortert for så å bli  
 brukt til å populere satstabell menyene.  
@@ -45,7 +45,7 @@ brukt til å populere satstabell menyene.
 I det en satstabell-kategori komponent åpnes kalles endepunktet til hver av  
 tabellene i denne kategorien og selve tabell-komponenten populeres.  
   
-Applikasjonen har alltid én tabell aktiv, default er tabellen som er aktiv i Q4.  
+Applikasjonen har alltid én tabell aktiv, default er tabellen som er aktiv i Q2.  
 Dette kan endres ved å velge en av tabellene i de tre tabell menyene, eller å peke  
 applikasjonen mot et annet miljø.  
 Måten dette settes på er ved at i `app.js` sendes det en funksjon som kan endre denne verdien  
