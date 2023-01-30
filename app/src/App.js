@@ -26,7 +26,7 @@ class App extends React.Component {
       prodTabeller: [],
       testTabeller: [],
       valgtTabell: 'PROD',
-      valgtMiljø: 'Q4',
+      valgtMiljø: 'Q2',
       aktiv: false,
       displayTabell: 'PROD',
       buttonVariant: 'secondary',
@@ -84,7 +84,7 @@ class App extends React.Component {
   /* Metode som kjører i det applikasjonen starter, gjør et api-kall til pensjon-regler for å hente alle tabeller 
   før disse blir sortert og sendt videre til dropdown meny komponenter */
   componentDidMount() {
-    fetch('https://pensjon-regler-q4.dev.adeo.no/alleSatstabeller'
+    fetch('https://pensjon-regler-q2.dev.adeo.no/alleSatstabeller'
       , {
         headers: {
           'Content-Type': 'application/json',
@@ -128,7 +128,7 @@ class App extends React.Component {
   /* Metode for å endre valgt tabell, sendes som parameter til dropdown menyene for å gjøre det mulig å endre tabell 
   i app komponenten fra underkomponenter */
   handleTabellChange(name) {
-    this.setState({ valgtTabell: name, valgtMiljø: 'Q4', aktiv: false, displayTabell: name })
+    this.setState({ valgtTabell: name, valgtMiljø: 'Q2', aktiv: false, displayTabell: name })
   }
 
 /* Metode for å endre valgt miljø, sendes som parameter til dropdown menyene for å gjøre det mulig å endre miljø 
@@ -156,7 +156,7 @@ class App extends React.Component {
           <DropdownMenu href={"ProdTabeller"} name="PROD Tabeller" list={ProdTabeller} prevTabell={this.state.valgtTabell} onTabellChange={this.handleTabellChange} variant={this.state.buttonVariant}>PROD Tabeller</DropdownMenu>
           <DropdownMenu href={"TestTabeller"} name="Test Tabeller" list={TestTabeller} prevTabell={this.state.valgtTabell} onTabellChange={this.handleTabellChange} variant={this.state.buttonVariant}>Test Tabeller</DropdownMenu>
           <DropdownMenu href={"AndreTabeller"} name="Andre Tabeller" list={AndreTabeller} prevTabell={this.state.valgtTabell} onTabellChange={this.handleTabellChange} variant={this.state.buttonVariant}>Andre Tabeller</DropdownMenu>
-          <DropdownMenu href={"MiljøTabeller"} name="Aktiv Tabell i Miljø" list={["Q0", "Q1", "Q2", "Q4", "Q5", "PROD"]} onTabellChange={this.handleMiljøChange} variant={this.state.buttonVariant}>Aktiv Tabell i Miljø</DropdownMenu>
+          <DropdownMenu href={"MiljøTabeller"} name="Aktiv Tabell i Miljø" list={["Q0", "Q1", "Q2", "Q5", "PROD"]} onTabellChange={this.handleMiljøChange} variant={this.state.buttonVariant}>Aktiv Tabell i Miljø</DropdownMenu>
         </div>
 
         <div className="valgt-tabell">
