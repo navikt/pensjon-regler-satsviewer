@@ -15,7 +15,13 @@ class UføretrygdMinsteytelseTabell extends React.Component {
         this.handleClick = this.handleClick.bind(this);
     }
     componentDidMount() {
-        fetch('https://pensjon-regler-'+this.props.valgtMiljø+'.dev.adeo.no/api/uføretrygdMinsteytelseSats?Aktiv='+this.props.aktiv+'&Satstabell='+this.props.currentTabell
+        let url;
+        if (this.props.valgtMiljø === 'PROD') {
+            url = 'https://pensjon-regler.intern.nav.no/api/uføretrygdMinsteytelseSats?Aktiv=' + this.props.aktiv + '&Satstabell=' + this.props.currentTabell
+        } else {
+            url = 'https://pensjon-regler-' + this.props.valgtMiljø + '.dev.adeo.no/api/uføretrygdMinsteytelseSats?Aktiv=' + this.props.aktiv + '&Satstabell=' + this.props.currentTabell
+        }
+        fetch(url
         ,{
           headers : { 
             'Content-Type': 'application/json',
