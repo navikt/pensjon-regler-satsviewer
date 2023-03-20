@@ -68,8 +68,8 @@ class GarantiPensjonsnivåTabell extends React.Component {
                         <tr key = {key}>
                         <td>{((data.satsFom[0]) < 0) ? 'N/A' : (data.satsFom[2]+'-'+data.satsFom[1]+'-'+data.satsFom[0])}</td>
                         <td>{((data.satsTom[0]) > 10000) ? 'N/A' : (data.satsTom[2]+'-'+data.satsTom[1]+'-'+data.satsTom[0])}</td>
-                        <td>{data.kodeMap[1].GPN_ORDINAER}</td>
-                        <td>{data.kodeMap[1].GPN_HOY}</td>
+                        <td>{data.kodeMap[1].ORDINAER}</td>
+                        <td>{data.kodeMap[1].HOY}</td>
                         </tr>
             )})}
              </tbody>
