@@ -25,10 +25,10 @@ class App extends React.Component {
       andreTabeller: [],
       prodTabeller: [],
       testTabeller: [],
-      valgtTabell: 'PROD',
+      valgtTabell: 'PROD_26052023',
       valgtMiljø: 'Q2',
       aktiv: false,
-      displayTabell: 'PROD',
+      displayTabell: 'PROD_26052023',
       buttonVariant: 'secondary',
       logo: logo_dark
     }
