@@ -19,12 +19,7 @@ class BarnetilleggTak2016Tabell extends React.Component {
     }
 
     componentDidMount() {
-        let url;
-        if (this.props.valgtMiljø === 'PROD') {
-            url = 'https://pensjon-regler.intern.nav.no/api/barnetilleggTak2016Sats?Aktiv=' + this.props.aktiv + '&Satstabell=' + this.props.currentTabell
-        } else {
-            url = 'https://pensjon-regler-' + this.props.valgtMiljø + '.dev.adeo.no/api/barnetilleggTak2016Sats?Aktiv=' + this.props.aktiv + '&Satstabell=' + this.props.currentTabell
-        }
+        let url = 'https://pensjon-regler-' + this.props.valgtMiljø + '.dev.adeo.no/api/barnetilleggTak2016Sats?Aktiv=' + this.props.aktiv + '&Satstabell=' + this.props.currentTabell
         fetch(url
             , {
                 headers: {

@@ -15,12 +15,7 @@ class SærtilleggTabell extends React.Component {
         this.handleClick = this.handleClick.bind(this);
     }
     componentDidMount() {
-        let url;
-        if (this.props.valgtMiljø === 'PROD') {
-            url = 'https://pensjon-regler.intern.nav.no/api/særtilleggSats?Aktiv=' + this.props.aktiv + '&Satstabell=' + this.props.currentTabell
-        } else {
-            url = 'https://pensjon-regler-' + this.props.valgtMiljø + '.dev.adeo.no/api/særtilleggSats?Aktiv=' + this.props.aktiv + '&Satstabell=' + this.props.currentTabell
-        }
+        let url = 'https://pensjon-regler-' + this.props.valgtMiljø + '.dev.adeo.no/api/særtilleggSats?Aktiv=' + this.props.aktiv + '&Satstabell=' + this.props.currentTabell
         fetch(url
         ,{
           headers : { 
