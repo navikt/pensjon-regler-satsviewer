@@ -26,7 +26,7 @@ class App extends React.Component {
       prodTabeller: [],
       testTabeller: [],
       valgtTabell: 'Velg satstabell',
-      valgtMiljø: 'Q2',
+      valgtMiljø: 'Ingen valgt',
       aktiv: false,
       displayTabell: 'Velg satstabell',
       buttonVariant: 'secondary',

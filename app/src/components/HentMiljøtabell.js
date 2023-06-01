@@ -11,22 +11,27 @@ class HentMiljøtabell extends React.Component {
     }
 
     componentDidMount() {
-        fetch('https://pensjon-regler-' + this.props.valgtMiljø + '.dev.adeo.no/aktivTabell', {
-                headers: {
-                    'Content-Type': 'application/text',
-                    'Accept': 'application/text'
-                }
-            }
-        )
-            .then(res => res.text())
-            .then(
-                (result) => {
-                    this.setState({displayTabell: result})
+        if (this.props.aktiv) {
+            fetch('https://pensjon-regler-' + this.props.valgtMiljø + '.dev.adeo.no/aktivTabell', {
+                    headers: {
+                        'Content-Type': 'application/text',
+                        'Accept': 'application/text'
+                    }
                 }
             )
+                .then(res => res.text())
+                .then(
+                    (result) => {
+                        this.setState({displayTabell: result})
+                    }
+                )
+        } else {
+            this.setState({displayTabell: this.props.displayTabell})
+        }
     }
 
     render() {
+        console.log("hentmiljøtabell.displayTabell: " + this.state.displayTabell)
         return (
             <div>
                 <h1> Valgt Tabell: {this.state.displayTabell}</h1>
