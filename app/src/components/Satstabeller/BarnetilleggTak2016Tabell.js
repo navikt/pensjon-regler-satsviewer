@@ -2,6 +2,7 @@ import React from "react";
 import {Table} from "react-bootstrap";
 import "../../App.css";
 import Satsheader from "../Satsheader";
+import defaultTabellRender from "../IngenSatsValgt";
 
 class BarnetilleggTak2016Tabell extends React.Component {
     constructor(props) {
@@ -52,31 +53,36 @@ class BarnetilleggTak2016Tabell extends React.Component {
     }
 
     render() {
-        const TabellRender = () => (
-            <div>
-                <Table striped bordered hover>
-                    <thead className="th">
-                    <tr>
-                        <th>FomDato</th>
-                        <th>TomDato</th>
-                        <th>Ordinær</th>
-                        <th>Overgangsregler</th>
-                    </tr>
-                    </thead>
-                    <tbody className="tabell-body">
-                    {this.state.verdier.map((data, key) => {
-                        return (
-                            <tr key={key}>
-                                <td>{((data.satsFom[0]) < 0) ? 'N/A' : (data.satsFom[2] + '-' + data.satsFom[1] + '-' + data.satsFom[0])}</td>
-                                <td>{((data.satsTom[0]) > 10000) ? 'N/A' : (data.satsTom[2] + '-' + data.satsTom[1] + '-' + data.satsTom[0])}</td>
-                                <td>{data.kodeMap[1].ORDINÆR}</td>
-                                <td>{data.kodeMap[1].OVERGANGSREGLER}</td>
-                            </tr>
-                        )
-                    })}
-                    </tbody>
-                </Table></div>
-        )
+        let TabellRender
+        if (this.state.verdier !== undefined) {
+            TabellRender = () => (
+                <div>
+                    <Table striped bordered hover>
+                        <thead className="th">
+                        <tr>
+                            <th>FomDato</th>
+                            <th>TomDato</th>
+                            <th>Ordinær</th>
+                            <th>Overgangsregler</th>
+                        </tr>
+                        </thead>
+                        <tbody className="tabell-body">
+                        {this.state.verdier.map((data, key) => {
+                            return (
+                                <tr key={key}>
+                                    <td>{((data.satsFom[0]) < 0) ? 'N/A' : (data.satsFom[2] + '-' + data.satsFom[1] + '-' + data.satsFom[0])}</td>
+                                    <td>{((data.satsTom[0]) > 10000) ? 'N/A' : (data.satsTom[2] + '-' + data.satsTom[1] + '-' + data.satsTom[0])}</td>
+                                    <td>{data.kodeMap[1].ORDINÆR}</td>
+                                    <td>{data.kodeMap[1].OVERGANGSREGLER}</td>
+                                </tr>
+                            )
+                        })}
+                        </tbody>
+                    </Table></div>
+            )
+        } else {
+            TabellRender = defaultTabellRender
+        }
         return (
             <div>
                 <div onClick={this.handleClick}>
