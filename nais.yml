@@ -30,4 +30,3 @@ spec:
       memory: "512Mi"
   ingresses:
     - "https://pensjon-regler-satsviewer.dev.adeo.no"
-    - "https://pensjon-regler-satsviewer.dev-fss.nais.io"
