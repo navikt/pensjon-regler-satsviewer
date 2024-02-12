@@ -52,7 +52,7 @@ class MinstePensjonsnivåTabell extends React.Component {
     render() {
         let TabellRender
         if (this.state.verdier !== undefined) {
-            return () => (
+            TabellRender = () => (
                 <div><Table striped bordered hover>
                     <thead className="th">
                     <tr>
