@@ -1,0 +1,15 @@
+export const environments = ['q0', 'q1', 'q2', 'q5'];
+export const veietGrunnbeløpSats = 'veietGrunnbeløpSats';
+export const grunnbeløpSats = 'grunnbeløpSats';
+export const reguleringsFaktorSats = 'reguleringsFaktorSats';
+export const lønnsvekstSats = 'lønnsvekstSats';
+export const grunnpensjonSats = 'grunnpensjonSats';
+export const særtilleggSats = 'særtilleggSats';
+export const minstePensjonsNivåSats = 'minstePensjonsNivåSats';
+export const garantiPensjonsNivåSats = 'garantiPensjonsNivåSats';
+export const skjermingstilleggSats = 'skjermingstilleggSats';
+export const uføretrygdMinsteytelseSats = 'uføretrygdMinsteytelseSats';
+export const rettsgebyrSats = 'rettsgebyrSats';
+export const barnetilleggTak2016Sats = 'barnetilleggTak2016Sats';
+export const nordiskKonvensjonsLandSats = 'nordiskKonvensjonsLandSats';
+export const eøsKonvensjonsLandSats = 'eøsKonvensjonsLandSats';
