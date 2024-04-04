@@ -1,7 +1,7 @@
 # build frontend and server
 FROM node:lts-alpine3.19 as build
 WORKDIR /.
-COPY package.json package-lock.json vite.config.js ./
+COPY package.json package-lock.json tsconfig.json tsconfig.node.json vite.config.ts ./
 RUN npm ci
 
 COPY /. ./
