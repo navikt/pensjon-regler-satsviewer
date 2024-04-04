@@ -1,0 +1,48 @@
+name: Satsviewer build and deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_deploy:
+    permissions:
+      actions: read
+      checks: read
+      contents: read
+      deployments: write
+      packages: write
+      pull-requests: write
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+      - name: Login to Github Package Registry
+        env:
+          DOCKER_USERNAME: token
+          DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin ghcr.io
+      - name: Create Docker tag
+        run: |
+          echo "ghcr.io"/"$GITHUB_REPOSITORY"/"bwtestrep" > .docker_image
+          echo "$(date "+%Y-%m-%d-%H-%M-%S")-$(git rev-parse --short HEAD)" > .docker_tag
+      - name: Build Docker image
+        run: "docker build -t $(cat .docker_image):$(cat .docker_tag) -f ./Dockerfile ./"
+      - name: Push Docker image
+        run: "docker push $(cat .docker_image):$(cat .docker_tag)"
+      - name: Push latest Docker image
+        run: |
+          docker tag $(cat .docker_image):$(cat .docker_tag) $(cat .docker_image):latest
+          docker push $(cat .docker_image):latest
+          echo "IMAGE=$(cat .docker_image):$(cat .docker_tag)" >> $GITHUB_ENV
+      - name: Deploy to dev-fss
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: dev-fss
+          RESOURCE: nais.yml
+          IMAGE: ${{ env.IMAGE }}
+          TEAM: pensjon-regler

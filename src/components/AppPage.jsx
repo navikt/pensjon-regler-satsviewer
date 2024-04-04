@@ -16,7 +16,7 @@ import BarnetilleggTak2016Tabell from './satstabeller/BarnetilleggTak2016Tabell'
 import NordiskKonvensjonslandTabell from './satstabeller/NordiskKonvensjonslandTabell';
 import EØSKonvensjonslandTabell from './satstabeller/EØSKonvensjonslandTabell';
 import {ErrorBoundary} from 'react-error-boundary';
-import {environments} from '../contants/Constants';
+import {environments} from '../constants/Constants';
 import AtkivTabellKontroller from './AktivTabellKontroller';
 
 const AppPage = () => {

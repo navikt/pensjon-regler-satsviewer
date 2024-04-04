@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Accordion, Loader, Table } from "@navikt/ds-react";
-import { minstePensjonsNivåSats } from "../../contants/Constants";
+import { minstePensjonsNivåSats } from "../../constants/Constants";
 import { querySatsTabellByMiljøAndTypeAndAktiv } from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
 import { useQueryClient } from '@tanstack/react-query';

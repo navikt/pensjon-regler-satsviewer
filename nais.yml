@@ -1,0 +1,32 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: "pensjon-regler-satsviewer"
+  namespace: "pensjon-regler"
+  labels:
+    team: "pensjon-regler"
+  annotations:
+    nais.io/read-only-file-system: "false"
+spec:
+  image: "{{ image }}"
+  port: 8080
+  replicas:
+    min: 2
+    max: 2
+  liveness:
+    path: "/index.html"
+    initialDelay: 40
+    timeout: 3
+  readiness:
+    path: "/index.html"
+    initialDelay: 40
+    timeout: 3
+  resources:
+    limits:
+      cpu: "1"
+      memory: "2048Mi"
+    requests:
+      cpu: "100m"
+      memory: "512Mi"
+  ingresses:
+    - "https://pensjon-regler-satsviewer.dev.adeo.no"

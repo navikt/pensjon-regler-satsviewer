@@ -1,6 +1,6 @@
 import {useEffect} from "react";
 import {Accordion, Loader, Table} from "@navikt/ds-react";
-import {barnetilleggTak2016Sats} from "../../contants/Constants";
+import {barnetilleggTak2016Sats} from "../../constants/Constants";
 import {querySatsTabellByMiljøAndTypeAndAktiv} from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
 import {useQueryClient} from '@tanstack/react-query';

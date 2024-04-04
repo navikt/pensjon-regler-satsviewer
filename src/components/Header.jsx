@@ -1,5 +1,5 @@
 import {Dropdown, InternalHeader, Spacer} from "@navikt/ds-react";
-import {environments} from "../contants/Constants";
+import {environments} from "../constants/Constants";
 
 const Header = ({onChangedEnvironment}) => {
 
