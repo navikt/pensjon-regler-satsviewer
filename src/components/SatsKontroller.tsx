@@ -61,6 +61,19 @@ const SatsKontroller: FC<SatsKontrollerProps> = ({ environment, onSatsChange }) 
                     ))}
                 </Select>
             </Box>
+
+            <Box>
+                <Select label="TEST satser" onChange={(event: ChangeEvent<HTMLSelectElement>) => {
+                    onSatsChange(event.target.value);
+                }}>
+                    <option value="">Velg øvrig sats</option>
+                    {data[1].filter(andreFilter).map((sats: string) => (
+                        <option key={sats} value={sats}>
+                            {sats}
+                        </option>
+                    ))}
+                </Select>
+            </Box>
         </HGrid>
     );
 }
