@@ -1,12 +1,17 @@
-import {Dropdown, InternalHeader, Spacer} from "@navikt/ds-react";
-import {environments} from "../constants/Constants";
+import { Dropdown, InternalHeader, Spacer } from "@navikt/ds-react";
+import { environments } from "../constants/Constants";
+import { FC, ChangeEvent } from 'react';
 
-const Header = ({onChangedEnvironment}) => {
+interface HeaderProps {
+    onChangedEnvironment: (event: ChangeEvent<HTMLSelectElement>) => void;
+}
+
+const Header: FC<HeaderProps> = ({ onChangedEnvironment }) => {
 
     return (
         <InternalHeader>
             <InternalHeader.Title as="h1">pensjon-regler-satsviewer</InternalHeader.Title>
-            <Spacer/>
+            <Spacer />
             <Dropdown onSelect={(event) => onChangedEnvironment(event)}>
                 <InternalHeader.Button as={Dropdown.Toggle}>
                     Velg miljø
@@ -22,4 +27,5 @@ const Header = ({onChangedEnvironment}) => {
         </InternalHeader>
     );
 };
+
 export default Header;

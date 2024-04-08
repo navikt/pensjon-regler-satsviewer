@@ -1,17 +1,28 @@
-import { useEffect } from "react";
+import { useEffect, FC } from "react";
 import { Accordion, Loader, Table } from "@navikt/ds-react";
-import { særtilleggSats } from "../../constants/Constants";
+import { eøsKonvensjonsLandSats } from "../../constants/Constants";
 import { querySatsTabellByMiljøAndTypeAndAktiv } from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
 import { useQueryClient } from '@tanstack/react-query';
 
-const SærtilleggTabell = ({ environment, satstabell }) => {
+interface EØSKonvensjonslandTabellProps {
+    environment: string;
+    satstabell: string;
+}
 
-    const type = særtilleggSats;
+interface Rad {
+    satsFom: number[];
+    satsTom: number[];
+    value: number;
+}
+
+const EØSKonvensjonslandTabell: FC<EØSKonvensjonslandTabellProps> = ({ environment, satstabell }) => {
+
+    const type = eøsKonvensjonsLandSats;
     const queryClient = useQueryClient();
 
     useEffect(() => {
-        queryClient.invalidateQueries("satsTabell");
+        queryClient.invalidateQueries({ queryKey: ['satsTabell'] });
     }, [satstabell]);
 
     const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell);
@@ -29,11 +40,10 @@ const SærtilleggTabell = ({ environment, satstabell }) => {
     }
 
     return (
-
         <Accordion>
             <Accordion.Item>
                 <Accordion.Header>
-                    Særtillegg
+                    EØS konvensjonsland
                 </Accordion.Header>
                 <Accordion.Content>
                     {isSuccess && data[1] ?
@@ -42,20 +52,16 @@ const SærtilleggTabell = ({ environment, satstabell }) => {
                                 <Table.Row>
                                     <Table.HeaderCell scope="col">FomDato</Table.HeaderCell>
                                     <Table.HeaderCell scope="col">TomDato</Table.HeaderCell>
-                                    <Table.HeaderCell scope="col">Minste</Table.HeaderCell>
-                                    <Table.HeaderCell scope="col">Ordinær</Table.HeaderCell>
-                                    <Table.HeaderCell scope="col">Forhøyet</Table.HeaderCell>
+                                    <Table.HeaderCell scope="col">Verdi</Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {data[1]?.map((rad, key) => {
+                                {data[1]?.map((rad: Rad, key: number) => {
                                     return (
                                         <Table.Row key={key}>
                                             <Table.DataCell>{((rad?.satsFom[0]) < 0) ? 'N/A' : (rad?.satsFom[2] + '-' + rad?.satsFom[1] + '-' + rad?.satsFom[0])}</Table.DataCell>
                                             <Table.DataCell>{((rad?.satsTom[0]) > 10000) ? 'N/A' : (rad?.satsTom[2] + '-' + rad?.satsTom[1] + '-' + rad?.satsTom[0])}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap[1]?.Minste}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap[1]?.Ordinær}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap[1]?.Forhøyet}</Table.DataCell>
+                                            <Table.DataCell>{rad?.value}</Table.DataCell>
                                         </Table.Row>
                                     )
                                 })}
@@ -66,7 +72,6 @@ const SærtilleggTabell = ({ environment, satstabell }) => {
             </Accordion.Item>
         </Accordion>
     );
-
 }
 
-export default SærtilleggTabell;
+export default EØSKonvensjonslandTabell;

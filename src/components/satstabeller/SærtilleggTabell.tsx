@@ -1,17 +1,35 @@
-import { useEffect } from "react";
+import { useEffect, FC } from "react";
 import { Accordion, Loader, Table } from "@navikt/ds-react";
-import { veietGrunnbeløpSats } from "../../constants/Constants";
+import { særtilleggSats } from "../../constants/Constants";
 import { querySatsTabellByMiljøAndTypeAndAktiv } from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
 import { useQueryClient } from '@tanstack/react-query';
 
-const VeietGrunnbeløpTabell = ({ environment, satstabell }) => {
+interface SærtilleggTabellProps {
+    environment: string;
+    satstabell: string;
+}
 
-    const type = veietGrunnbeløpSats;
+interface Rad {
+    satsFom: number[];
+    satsTom: number[];
+    kodeMap: [
+        string,
+        {
+            Minste: number;
+            Ordinær: number;
+            Forhøyet: number;
+        }
+    ];
+}
+
+const SærtilleggTabell: FC<SærtilleggTabellProps> = ({ environment, satstabell }) => {
+
+    const type = særtilleggSats;
     const queryClient = useQueryClient();
 
     useEffect(() => {
-        queryClient.invalidateQueries("satsTabell");
+        queryClient.invalidateQueries({ queryKey: ['satsTabell'] });
     }, [satstabell]);
 
     const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell);
@@ -25,15 +43,14 @@ const VeietGrunnbeløpTabell = ({ environment, satstabell }) => {
     }
 
     if (isFetching) {
-        return <Loader size="3xlarge" title="Laster ..." className="loader" />;
+        return <Loader size="3xlarge" title="Laster ..." className="loader" />
     }
 
     return (
-
         <Accordion>
             <Accordion.Item>
                 <Accordion.Header>
-                    Veiet Grunnbeløp
+                    Særtillegg
                 </Accordion.Header>
                 <Accordion.Content>
                     {isSuccess && data[1] ?
@@ -42,27 +59,31 @@ const VeietGrunnbeløpTabell = ({ environment, satstabell }) => {
                                 <Table.Row>
                                     <Table.HeaderCell scope="col">FomDato</Table.HeaderCell>
                                     <Table.HeaderCell scope="col">TomDato</Table.HeaderCell>
-                                    <Table.HeaderCell scope="col">Verdi</Table.HeaderCell>
+                                    <Table.HeaderCell scope="col">Minste</Table.HeaderCell>
+                                    <Table.HeaderCell scope="col">Ordinær</Table.HeaderCell>
+                                    <Table.HeaderCell scope="col">Forhøyet</Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {data[1]?.map((rad, key) => {
+                                {data[1]?.map((rad: Rad, key: number) => {
                                     return (
                                         <Table.Row key={key}>
                                             <Table.DataCell>{((rad?.satsFom[0]) < 0) ? 'N/A' : (rad?.satsFom[2] + '-' + rad?.satsFom[1] + '-' + rad?.satsFom[0])}</Table.DataCell>
                                             <Table.DataCell>{((rad?.satsTom[0]) > 10000) ? 'N/A' : (rad?.satsTom[2] + '-' + rad?.satsTom[1] + '-' + rad?.satsTom[0])}</Table.DataCell>
-                                            <Table.DataCell>{rad?.value}</Table.DataCell>
+                                            <Table.DataCell>{rad?.kodeMap[1]?.Minste}</Table.DataCell>
+                                            <Table.DataCell>{rad?.kodeMap[1]?.Ordinær}</Table.DataCell>
+                                            <Table.DataCell>{rad?.kodeMap[1]?.Forhøyet}</Table.DataCell>
                                         </Table.Row>
                                     )
                                 })}
                             </Table.Body>
                         </Table> :
-                        <DefaultTable />}
+                        <DefaultTable />
+                    }
                 </Accordion.Content>
             </Accordion.Item>
         </Accordion>
     );
-
 }
 
-export default VeietGrunnbeløpTabell;
+export default SærtilleggTabell

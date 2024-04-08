@@ -1,17 +1,33 @@
-import { useEffect } from "react";
+import { useEffect, FC } from "react";
 import { Accordion, Loader, Table } from "@navikt/ds-react";
-import { skjermingstilleggSats } from "../../constants/Constants";
+import { barnetilleggTak2016Sats } from "../../constants/Constants";
 import { querySatsTabellByMiljøAndTypeAndAktiv } from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
 import { useQueryClient } from '@tanstack/react-query';
 
-const SkjermingsTilleggTabell = ({ environment, satstabell }) => {
+interface BarnetilleggTak2016TabellProps {
+    environment: string;
+    satstabell: string;
+}
 
-    const type = skjermingstilleggSats;
+interface Rad {
+    satsFom: number[];
+    satsTom: number[];
+    kodeMap: {
+        [key: number]: {
+            ORDINÆR: number;
+            OVERGANGSREGLER: number;
+        };
+    };
+}
+
+const BarnetilleggTak2016Tabell: FC<BarnetilleggTak2016TabellProps> = ({ environment, satstabell }) => {
+
+    const type = barnetilleggTak2016Sats;
     const queryClient = useQueryClient();
 
     useEffect(() => {
-        queryClient.invalidateQueries("satsTabell");
+        queryClient.invalidateQueries({ queryKey: ['satsTabell'] });
     }, [satstabell]);
 
     const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell);
@@ -29,11 +45,10 @@ const SkjermingsTilleggTabell = ({ environment, satstabell }) => {
     }
 
     return (
-
         <Accordion>
             <Accordion.Item>
                 <Accordion.Header>
-                    Skjermingstillegg
+                    Barnetillegg Tak 2016
                 </Accordion.Header>
                 <Accordion.Content>
                     {isSuccess && data[1] ?
@@ -42,16 +57,18 @@ const SkjermingsTilleggTabell = ({ environment, satstabell }) => {
                                 <Table.Row>
                                     <Table.HeaderCell scope="col">FomDato</Table.HeaderCell>
                                     <Table.HeaderCell scope="col">TomDato</Table.HeaderCell>
-                                    <Table.HeaderCell scope="col">Verdi</Table.HeaderCell>
+                                    <Table.HeaderCell scope="col">Ordinær</Table.HeaderCell>
+                                    <Table.HeaderCell scope="col">Overgangsregler</Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {data[1]?.map((rad, key) => {
+                                {data[1]?.map((rad: Rad, key: number) => {
                                     return (
                                         <Table.Row key={key}>
                                             <Table.DataCell>{((rad?.satsFom[0]) < 0) ? 'N/A' : (rad?.satsFom[2] + '-' + rad?.satsFom[1] + '-' + rad?.satsFom[0])}</Table.DataCell>
                                             <Table.DataCell>{((rad?.satsTom[0]) > 10000) ? 'N/A' : (rad?.satsTom[2] + '-' + rad?.satsTom[1] + '-' + rad?.satsTom[0])}</Table.DataCell>
-                                            <Table.DataCell>{rad?.value}</Table.DataCell>
+                                            <Table.DataCell>{rad?.kodeMap[1]?.ORDINÆR}</Table.DataCell>
+                                            <Table.DataCell>{rad?.kodeMap[1]?.OVERGANGSREGLER}</Table.DataCell>
                                         </Table.Row>
                                     )
                                 })}
@@ -62,7 +79,6 @@ const SkjermingsTilleggTabell = ({ environment, satstabell }) => {
             </Accordion.Item>
         </Accordion>
     );
-
 }
 
-export default SkjermingsTilleggTabell;
+export default BarnetilleggTak2016Tabell;

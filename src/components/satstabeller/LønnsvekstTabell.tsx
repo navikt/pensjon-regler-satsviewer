@@ -1,20 +1,31 @@
-import { useEffect } from "react";
+import { useEffect, FC } from "react";
 import { Accordion, Loader, Table } from "@navikt/ds-react";
-import { nordiskKonvensjonsLandSats } from "../../constants/Constants";
+import { lønnsvekstSats } from "../../constants/Constants";
 import { querySatsTabellByMiljøAndTypeAndAktiv } from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
 import { useQueryClient } from '@tanstack/react-query';
 
-const NordiskKonvensjonslandTabell = ({ environment, satstabell }) => {
+interface LønnsvekstTabellProps {
+    environment: string;
+    satstabell: string;
+}
 
-    const type = nordiskKonvensjonsLandSats;
+interface Rad {
+    satsFom: number[];
+    satsTom: number[];
+    value: number;
+}
+
+const LønnsvekstTabell: FC<LønnsvekstTabellProps> = ({ environment, satstabell }) => {
+
+    const type = lønnsvekstSats;
     const queryClient = useQueryClient();
 
     useEffect(() => {
-        queryClient.invalidateQueries("satsTabell");
+        queryClient.invalidateQueries({ queryKey: ['satsTabell'] });
     }, [satstabell]);
 
-    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell);
+    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, true, satstabell);
 
     if (isError) {
         throw new Error(`Det oppstod en feil ved henting av satsTabell mot miljø ${environment}.`);
@@ -29,11 +40,10 @@ const NordiskKonvensjonslandTabell = ({ environment, satstabell }) => {
     }
 
     return (
-
         <Accordion>
             <Accordion.Item>
                 <Accordion.Header>
-                    Nordisk konvensjonsland
+                    Lønnsvekst
                 </Accordion.Header>
                 <Accordion.Content>
                     {isSuccess && data[1] ?
@@ -46,7 +56,7 @@ const NordiskKonvensjonslandTabell = ({ environment, satstabell }) => {
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {data[1]?.map((rad, key) => {
+                                {data[1]?.map((rad: Rad, key: number) => {
                                     return (
                                         <Table.Row key={key}>
                                             <Table.DataCell>{((rad?.satsFom[0]) < 0) ? 'N/A' : (rad?.satsFom[2] + '-' + rad?.satsFom[1] + '-' + rad?.satsFom[0])}</Table.DataCell>
@@ -62,7 +72,6 @@ const NordiskKonvensjonslandTabell = ({ environment, satstabell }) => {
             </Accordion.Item>
         </Accordion>
     );
-
 }
 
-export default NordiskKonvensjonslandTabell;
+export default LønnsvekstTabell;
