@@ -1,5 +1,5 @@
-import { useState, FC, ChangeEvent } from 'react';
-import { Accordion, Alert, Box, Page } from "@navikt/ds-react";
+import {FC, useState} from 'react';
+import {Accordion, Alert, Box, Page} from "@navikt/ds-react";
 import Header from './Header';
 import VeietGrunnbeløpTabell from './satstabeller/VeietGrunnbeløpTabell';
 import GrunnbeløpTabell from './satstabeller/GrunnbeløpTabell';
@@ -15,15 +15,15 @@ import RettsgebyrTabell from './satstabeller/RettsgebyrTabell';
 import BarnetilleggTak2016Tabell from './satstabeller/BarnetilleggTak2016Tabell';
 import NordiskKonvensjonslandTabell from './satstabeller/NordiskKonvensjonslandTabell';
 import EØSKonvensjonslandTabell from './satstabeller/EØSKonvensjonslandTabell';
-import { ErrorBoundary } from 'react-error-boundary';
-import { environments } from '../constants/Constants';
+import {ErrorBoundary} from 'react-error-boundary';
+import {environments} from '../constants/Constants';
 import AktivTabellKontroller from './AktivTabellKontroller';
 
 interface ErrorFallbackProps {
     error: Error;
 }
 
-const ErrorFallback: FC<ErrorFallbackProps> = ({ error }) => {
+const ErrorFallback: FC<ErrorFallbackProps> = ({error}) => {
     return (
         <Alert variant='error'>
             {`En feil har oppstått: ${error.message}`}
@@ -36,8 +36,9 @@ const AppPage: FC = () => {
     const [sats, setSats] = useState<string | undefined>();
     const [environment, setEnvironment] = useState<string>(environments[2]);
 
-    const onChangedEnvironment = (event: ChangeEvent<HTMLSelectElement>) => {
-        setEnvironment(event.target.value);
+    const onChangedEnvironment = (event: React.MouseEvent<Element, MouseEvent>) => {
+        // @ts-ignore
+        setEnvironment(event && event.target ? event.target.innerText : undefined)
     }
 
     const onSatsChange = (sats: string) => {
@@ -49,7 +50,7 @@ const AppPage: FC = () => {
             <Page>
                 <Box as="header" background="surface-inverted">
                     <Page.Block width="2xl">
-                        <Header onChangedEnvironment={onChangedEnvironment} />
+                        <Header onChangedEnvironment={onChangedEnvironment}/>
                     </Page.Block>
                 </Box>
                 <Box
@@ -58,7 +59,7 @@ const AppPage: FC = () => {
                     as="main"
                 >
                     <Page.Block gutters width="2xl">
-                        <AktivTabellKontroller environment={environment} onSatsChange={onSatsChange} />
+                        <AktivTabellKontroller environment={environment} onSatsChange={onSatsChange}/>
                         {sats &&
                             <Accordion>
                                 <Accordion.Item>
@@ -66,10 +67,10 @@ const AppPage: FC = () => {
                                         Generelt
                                     </Accordion.Header>
                                     <Accordion.Content>
-                                        <GrunnbeløpTabell environment={environment} satstabell={sats} />
-                                        <VeietGrunnbeløpTabell environment={environment} satstabell={sats} />
-                                        <ReguleringsfaktorTabell environment={environment} satstabell={sats} />
-                                        <LønnsvekstTabell environment={environment} satstabell={sats} />
+                                        <GrunnbeløpTabell environment={environment} satstabell={sats}/>
+                                        <VeietGrunnbeløpTabell environment={environment} satstabell={sats}/>
+                                        <ReguleringsfaktorTabell environment={environment} satstabell={sats}/>
+                                        <LønnsvekstTabell environment={environment} satstabell={sats}/>
                                     </Accordion.Content>
                                 </Accordion.Item>
                                 <Accordion.Item>
@@ -77,8 +78,8 @@ const AppPage: FC = () => {
                                         Alderspensjon1967
                                     </Accordion.Header>
                                     <Accordion.Content>
-                                        <GrunnpensjonTabell environment={environment} satstabell={sats} />
-                                        <SærtilleggTabell environment={environment} satstabell={sats} />
+                                        <GrunnpensjonTabell environment={environment} satstabell={sats}/>
+                                        <SærtilleggTabell environment={environment} satstabell={sats}/>
                                     </Accordion.Content>
                                 </Accordion.Item>
                                 <Accordion.Item>
@@ -86,9 +87,9 @@ const AppPage: FC = () => {
                                         Alderspensjon2011
                                     </Accordion.Header>
                                     <Accordion.Content>
-                                        <MinstePensjonsnivåTabell environment={environment} satstabell={sats} />
-                                        <GarantiPensjonsnivåTabell environment={environment} satstabell={sats} />
-                                        <SkjermingsTilleggTabell environment={environment} satstabell={sats} />
+                                        <MinstePensjonsnivåTabell environment={environment} satstabell={sats}/>
+                                        <GarantiPensjonsnivåTabell environment={environment} satstabell={sats}/>
+                                        <SkjermingsTilleggTabell environment={environment} satstabell={sats}/>
                                     </Accordion.Content>
                                 </Accordion.Item>
                                 <Accordion.Item>
@@ -96,9 +97,9 @@ const AppPage: FC = () => {
                                         Uføretrygd
                                     </Accordion.Header>
                                     <Accordion.Content>
-                                        <UføretrygdMinsteytelseTabell environment={environment} satstabell={sats} />
-                                        <RettsgebyrTabell environment={environment} satstabell={sats} />
-                                        <BarnetilleggTak2016Tabell environment={environment} satstabell={sats} />
+                                        <UføretrygdMinsteytelseTabell environment={environment} satstabell={sats}/>
+                                        <RettsgebyrTabell environment={environment} satstabell={sats}/>
+                                        <BarnetilleggTak2016Tabell environment={environment} satstabell={sats}/>
                                     </Accordion.Content>
                                 </Accordion.Item>
                                 <Accordion.Item>
@@ -106,8 +107,8 @@ const AppPage: FC = () => {
                                         Konvensjonsland
                                     </Accordion.Header>
                                     <Accordion.Content>
-                                        <NordiskKonvensjonslandTabell environment={environment} satstabell={sats} />
-                                        <EØSKonvensjonslandTabell environment={environment} satstabell={sats} />
+                                        <NordiskKonvensjonslandTabell environment={environment} satstabell={sats}/>
+                                        <EØSKonvensjonslandTabell environment={environment} satstabell={sats}/>
                                     </Accordion.Content>
                                 </Accordion.Item>
                             </Accordion>

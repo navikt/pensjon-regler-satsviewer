@@ -1,9 +1,9 @@
 import { Dropdown, InternalHeader, Spacer } from "@navikt/ds-react";
 import { environments } from "../constants/Constants";
-import { FC, ChangeEvent } from 'react';
+import { FC } from 'react';
 
 interface HeaderProps {
-    onChangedEnvironment: (event: ChangeEvent<HTMLSelectElement>) => void;
+    onChangedEnvironment: (event:  React.MouseEvent<Element, MouseEvent>) => void;
 }
 
 const Header: FC<HeaderProps> = ({ onChangedEnvironment }) => {
@@ -12,7 +12,7 @@ const Header: FC<HeaderProps> = ({ onChangedEnvironment }) => {
         <InternalHeader>
             <InternalHeader.Title as="h1">pensjon-regler-satsviewer</InternalHeader.Title>
             <Spacer />
-            <Dropdown onSelect={(event) => onChangedEnvironment(event)}>
+            <Dropdown onSelect={(event: React.MouseEvent<Element, MouseEvent>) => onChangedEnvironment(event)}>
                 <InternalHeader.Button as={Dropdown.Toggle}>
                     Velg miljø
                 </InternalHeader.Button>
