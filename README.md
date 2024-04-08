@@ -24,7 +24,7 @@ eller noe annet er spesifisert.
 
 ## Struktur
 
-`App.js` er rot-komponenten for prosjektet. Her ligger overskrift, fargeknapper, logo, menyer for valg av satstabell  
+`App.ts` er rot-komponenten for prosjektet. Her ligger overskrift, fargeknapper, logo, menyer for valg av satstabell  
 og satstabell-kategori komponentene.
 
 Under satstabell-kategori komponentene ligger de respektive satstabellene.
@@ -36,7 +36,7 @@ Workflow-filene ligger under `<repo-root>/.github/workflows`
 
 ## Intern Informasjonsflyt
 
-I det applikasjonen åpnes gjøres et kall til
+I det applikasjonen åpnes gjøres et kall til (default q2)
 >https://pensjon-regler-q2.dev.adeo.no/alleSatstabeller 
 og
 >https://pensjon-regler-q2.dev.adeo.no/aktivTabell
@@ -44,7 +44,7 @@ og
 for å hente en liste over alle tilgjengelige satstabeller, samt aktiv satstabell for valgt miljø.
 
 I det en satstabell-kategori komponent åpnes kalles endepunktet til hver av  
-tabellene i denne kategorien og selve tabell-komponenten populeres.
+tabellene i denne kategorien og selve tabell-komponenten populeres. 
 
 Applikasjonen har alltid én tabell aktiv, default er tabellen som er aktiv i Q2.  
 Dette kan endres ved å velge et annet miljø i menyen.
