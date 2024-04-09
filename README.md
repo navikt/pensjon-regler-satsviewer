@@ -3,7 +3,7 @@
 
 Dette er et Vite React prosjekt, for å starte lokalt kreves node.js.
 
-Kan installeres på Mac med homebrev `brew install node` (for andre muligheter https://nodejs.org/en/download/package-manager/#macos, evt. https://nodejs.org/en/download/current/)
+Kan installeres på Mac med Homebrev `brew install node` (for andre muligheter https://nodejs.org/en/download/package-manager/#macos, evt. https://nodejs.org/en/download/current/)
 
 ## Kjøre lokalt
 
@@ -11,8 +11,8 @@ For å kjøre appen lokalt må man først installere pakker med kommandoen
 
 `npm i`
 
-i Node kommando vindu etter å ha navigert til
-(repo-location)/pensjon-regler-satsviewer
+i Node kommando-vindu etter å ha navigert til
+<repo-location>/pensjon-regler-satsviewer
 
 Deretter kan man starte appen lokalt med kommandoen:
 
@@ -20,12 +20,11 @@ Deretter kan man starte appen lokalt med kommandoen:
 
 Appen vil da åpnes i standard nettleseren på adressen *http://localhost:5137/*  
 med mindre denne porten er opptatt (Node vil da finne en annen ledig port)
-eller noe annet er spesifisert.
+eller noe annet om spesifisert.
 
 ## Struktur
 
-`App.ts` er rot-komponenten for prosjektet. Her ligger overskrift, fargeknapper, logo, menyer for valg av satstabell  
-og satstabell-kategori komponentene.
+`App.ts` er rot-komponenten for prosjektet. 
 
 Under satstabell-kategori komponentene ligger de respektive satstabellene.
 
@@ -51,6 +50,5 @@ Dette kan endres ved å velge et annet miljø i menyen.
 ## Utvikling
 
 Dersom det lages en ny satstabell må denne eksponeres via et nytt endepunkt i  
-pensjon-regler
-sin `HentSatsController`.  
-Deretter må det lages en ny tabell i Satsviewer på samme måte som andre tabeller er blitt laget
+komponenten `HentSatsController` fra pensjon-regler. 
+Deretter må det lages en ny tabell i Satsviewer på samme måte som andre tabeller er blitt laget i `src/components/satstabeller/`.
