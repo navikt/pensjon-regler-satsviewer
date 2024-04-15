@@ -12,7 +12,7 @@ interface MinstePensjonsnivåTabellProps {
 
 interface KodeMap {
     LAV: number;
-    ORDNIAER: number;
+    ORDINAER: number;
     HOY: number;
     HOY_ENSLIG: number;
     SAERSKILT: number;
@@ -74,7 +74,7 @@ const MinstePensjonsnivåTabell: FC<MinstePensjonsnivåTabellProps> = ({ environ
                                             <Table.DataCell>{((rad?.satsFom[0]) < 0) ? 'N/A' : (rad?.satsFom[2] + '-' + rad?.satsFom[1] + '-' + rad?.satsFom[0])}</Table.DataCell>
                                             <Table.DataCell>{((rad?.satsTom[0]) > 10000) ? 'N/A' : (rad?.satsTom[2] + '-' + rad?.satsTom[1] + '-' + rad?.satsTom[0])}</Table.DataCell>
                                             <Table.DataCell>{rad?.kodeMap[1]?.LAV}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap[1]?.ORDNIAER}</Table.DataCell>
+                                            <Table.DataCell>{rad?.kodeMap[1]?.ORDINAER}</Table.DataCell>
                                             <Table.DataCell>{rad?.kodeMap[1]?.HOY}</Table.DataCell>
                                             <Table.DataCell>{rad?.kodeMap[1]?.HOY_ENSLIG}</Table.DataCell>
                                             <Table.DataCell>{rad?.kodeMap[1]?.SAERSKILT}</Table.DataCell>
