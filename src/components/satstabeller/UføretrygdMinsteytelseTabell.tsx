@@ -69,6 +69,7 @@ const UføretrygdMinsteytelseTabell: FC<UføretrygdMinsteytelseTabellProps> = ({
                                 <Table.Row>
                                     <Table.HeaderCell scope="col">FomDato</Table.HeaderCell>
                                     <Table.HeaderCell scope="col">TomDato</Table.HeaderCell>
+                                    <Table.HeaderCell scope="col">Uføretrygd konvertert</Table.HeaderCell>
                                     <Table.HeaderCell scope="col">Beregnes som gift</Table.HeaderCell>
                                     <Table.HeaderCell scope="col">Ung ufør</Table.HeaderCell>
                                     <Table.HeaderCell scope="col">Forsørger Ektefelle over 60</Table.HeaderCell>
@@ -82,9 +83,10 @@ const UføretrygdMinsteytelseTabell: FC<UføretrygdMinsteytelseTabellProps> = ({
                                         <Table.Row key={key}>
                                             <Table.DataCell>{((rad?.satsFom[0]) < 0) ? 'N/A' : (rad?.satsFom[2] + '-' + rad?.satsFom[1] + '-' + rad?.satsFom[0])}</Table.DataCell>
                                             <Table.DataCell>{((rad?.satsTom[0]) > 10000) ? 'N/A' : (rad?.satsTom[2] + '-' + rad?.satsTom[1] + '-' + rad?.satsTom[0])}</Table.DataCell>
-                                            <Table.DataCell>{(rad?.beregnesSomGift ? rad?.beregnesSomGift.toString() : 'udefinert')}</Table.DataCell>
-                                            <Table.DataCell>{(rad?.ungUfor ? rad?.ungUfor.toString() : 'udefinert')}</Table.DataCell>
-                                            <Table.DataCell>{(rad?.forsorgerEktefelleOver60 ? rad?.forsorgerEktefelleOver60.toString() : 'udefinert')}</Table.DataCell>
+                                            <Table.DataCell>{(rad?.uftKonv !== undefined ? rad?.uftKonv.toString() : '*')}</Table.DataCell>
+                                            <Table.DataCell>{(rad?.beregnesSomGift !== undefined ? rad?.beregnesSomGift.toString() : '*')}</Table.DataCell>
+                                            <Table.DataCell>{(rad?.ungUfor !== undefined ? rad?.ungUfor.toString() : '*')}</Table.DataCell>
+                                            <Table.DataCell>{(rad?.forsorgerEktefelleOver60 !== undefined ? rad?.forsorgerEktefelleOver60.toString() : '*')}</Table.DataCell>
                                             <Table.DataCell>{rad?.satsMinsteytelse?.sats}</Table.DataCell>
                                             <Table.DataCell>{rad?.satsMinsteytelse?.satsType?.kode}</Table.DataCell>
                                         </Table.Row>
