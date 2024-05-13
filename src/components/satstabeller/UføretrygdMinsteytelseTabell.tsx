@@ -63,7 +63,7 @@ const UføretrygdMinsteytelseTabell: FC<UføretrygdMinsteytelseTabellProps> = ({
                     Uføretrygd minsteytelse
                 </Accordion.Header>
                 <Accordion.Content>
-                    {isSuccess && data[1] ?
+                    {isSuccess && data ?
                         <Table size="small" zebraStripes>
                             <Table.Header>
                                 <Table.Row>
@@ -78,7 +78,7 @@ const UføretrygdMinsteytelseTabell: FC<UføretrygdMinsteytelseTabellProps> = ({
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {data[1]?.map((rad: Rad, key: number) => {
+                                {data?.map((rad: Rad, key: number) => {
                                     return (
                                         <Table.Row key={key}>
                                             <Table.DataCell>{((rad?.satsFom[0]) < 0) ? 'N/A' : (rad?.satsFom[2] + '-' + rad?.satsFom[1] + '-' + rad?.satsFom[0])}</Table.DataCell>
