@@ -13,8 +13,12 @@ const fetchSatsByTabellByMiljøAndTypeAndAktivAndSatstabell = async (environment
                 'Accept': 'application/json'
             }
         });
-    console.log(response);
-    return response.json();
+    const data = await response.json();
+    if ( data[0] != undefined && data[0].length > 1 ) {
+        return data[1]
+    } else {
+        return data
+    }
 }
 
 export const fetchAktivSatsTabellByMiljø = async (environment: string): Promise<string> => {
