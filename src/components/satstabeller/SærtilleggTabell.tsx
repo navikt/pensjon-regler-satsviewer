@@ -70,9 +70,9 @@ const SærtilleggTabell: FC<SærtilleggTabellProps> = ({ environment, satstabell
                                         <Table.Row key={key}>
                                             <Table.DataCell>{((rad?.satsFom[0]) < 0) ? 'N/A' : (rad?.satsFom[2] + '-' + rad?.satsFom[1] + '-' + rad?.satsFom[0])}</Table.DataCell>
                                             <Table.DataCell>{((rad?.satsTom[0]) > 10000) ? 'N/A' : (rad?.satsTom[2] + '-' + rad?.satsTom[1] + '-' + rad?.satsTom[0])}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap[1]?.Minste}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap[1]?.Ordinær}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap[1]?.Forhøyet}</Table.DataCell>
+                                            <Table.DataCell>{rad?.kodeMap?.Minste}</Table.DataCell>
+                                            <Table.DataCell>{rad?.kodeMap?.Ordinær}</Table.DataCell>
+                                            <Table.DataCell>{rad?.kodeMap?.Forhøyet}</Table.DataCell>
                                         </Table.Row>
                                     )
                                 })}

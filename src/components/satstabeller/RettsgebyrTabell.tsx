@@ -72,10 +72,10 @@ const RettsgebyrTabell: FC<RettsgebyrTabellProps> = ({ environment, satstabell }
                                         <Table.Row key={key}>
                                             <Table.DataCell>{((rad?.satsFom[0]) < 0) ? 'N/A' : (rad?.satsFom[2] + '-' + rad?.satsFom[1] + '-' + rad?.satsFom[0])}</Table.DataCell>
                                             <Table.DataCell>{((rad?.satsTom[0]) > 10000) ? 'N/A' : (rad?.satsTom[2] + '-' + rad?.satsTom[1] + '-' + rad?.satsTom[0])}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap[1]?.RETTSGEBYR}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap[1]?.TOL_GR_EO_ETTERBET}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap[1]?.TOL_GR_EO_TILBAKEKR}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap[1]?.TERSKEL_FEILUTBET}</Table.DataCell>
+                                            <Table.DataCell>{rad?.kodeMap?.RETTSGEBYR}</Table.DataCell>
+                                            <Table.DataCell>{rad?.kodeMap?.TOL_GR_EO_ETTERBET}</Table.DataCell>
+                                            <Table.DataCell>{rad?.kodeMap?.TOL_GR_EO_TILBAKEKR}</Table.DataCell>
+                                            <Table.DataCell>{rad?.kodeMap?.TERSKEL_FEILUTBET}</Table.DataCell>
                                         </Table.Row>
                                     )
                                 })}

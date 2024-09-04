@@ -13,7 +13,7 @@ interface EØSKonvensjonslandTabellProps {
 interface Rad {
     satsFom: number[];
     satsTom: number[];
-    value: number;
+    value: number | string; //TODO: endre til riktig type, hvorfor har det fungert med number?
 }
 
 const EØSKonvensjonslandTabell: FC<EØSKonvensjonslandTabellProps> = ({ environment, satstabell }) => {

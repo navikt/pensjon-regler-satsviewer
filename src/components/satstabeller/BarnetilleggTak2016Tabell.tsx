@@ -67,8 +67,8 @@ const BarnetilleggTak2016Tabell: FC<BarnetilleggTak2016TabellProps> = ({ environ
                                         <Table.Row key={key}>
                                             <Table.DataCell>{((rad?.satsFom[0]) < 0) ? 'N/A' : (rad?.satsFom[2] + '-' + rad?.satsFom[1] + '-' + rad?.satsFom[0])}</Table.DataCell>
                                             <Table.DataCell>{((rad?.satsTom[0]) > 10000) ? 'N/A' : (rad?.satsTom[2] + '-' + rad?.satsTom[1] + '-' + rad?.satsTom[0])}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap[1]?.ORDINÆR}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap[1]?.OVERGANGSREGLER}</Table.DataCell>
+                                            <Table.DataCell>{rad?.kodeMap?.ORDINÆR}</Table.DataCell>
+                                            <Table.DataCell>{rad?.kodeMap?.OVERGANGSREGLER}</Table.DataCell>
                                         </Table.Row>
                                     )
                                 })}
