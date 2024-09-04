@@ -13,15 +13,12 @@ interface RettsgebyrTabellProps {
 interface Rad {
     satsFom: number[];
     satsTom: number[];
-    kodeMap: [
-        string,
-        {
-            RETTSGEBYR: number;
-            TOL_GR_EO_ETTERBET: number;
-            TOL_GR_EO_TILBAKEKR: number;
-            TERSKEL_FEILUTBET: number;
-        }
-    ];
+    kodeMap: {
+        RETTSGEBYR: number;
+        TOL_GR_EO_ETTERBET: number;
+        TOL_GR_EO_TILBAKEKR: number;
+        TERSKEL_FEILUTBET: number;
+        };
 }
 
 const RettsgebyrTabell: FC<RettsgebyrTabellProps> = ({ environment, satstabell }) => {

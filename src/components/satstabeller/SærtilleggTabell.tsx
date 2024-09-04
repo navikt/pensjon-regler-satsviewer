@@ -13,14 +13,11 @@ interface SærtilleggTabellProps {
 interface Rad {
     satsFom: number[];
     satsTom: number[];
-    kodeMap: [
-        string,
-        {
+    kodeMap: {
             Minste: number;
             Ordinær: number;
             Forhøyet: number;
-        }
-    ];
+        };
 }
 
 const SærtilleggTabell: FC<SærtilleggTabellProps> = ({ environment, satstabell }) => {

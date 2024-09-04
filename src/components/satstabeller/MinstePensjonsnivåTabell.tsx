@@ -10,18 +10,16 @@ interface MinstePensjonsnivåTabellProps {
     satstabell: string;
 }
 
-interface KodeMap {
-    LAV: number;
-    ORDINAER: number;
-    HOY: number;
-    HOY_ENSLIG: number;
-    SAERSKILT: number;
-}
-
 interface Rad {
     satsFom: number[];
     satsTom: number[];
-    kodeMap: KodeMap[];
+    kodeMap: {
+        LAV: number;
+        ORDINAER: number;
+        HOY: number;
+        HOY_ENSLIG: number;
+        SAERSKILT: number;
+    }
 }
 
 const MinstePensjonsnivåTabell: FC<MinstePensjonsnivåTabellProps> = ({ environment, satstabell }) => {

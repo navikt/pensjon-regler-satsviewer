@@ -14,10 +14,8 @@ interface Rad {
     satsFom: number[];
     satsTom: number[];
     kodeMap: {
-        [key: number]: {
-            ORDINÆR: number;
-            OVERGANGSREGLER: number;
-        };
+        ORDINÆR: number;
+        OVERGANGSREGLER: number;
     };
 }
 

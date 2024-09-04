@@ -14,10 +14,8 @@ interface Rad {
     satsFom: number[];
     satsTom: number[];
     kodeMap: {
-        [key: number]: {
-            ORDINAER: number;
-            HOY: number;
-        };
+        ORDINAER: number;
+        HOY: number;
     };
 }
 
