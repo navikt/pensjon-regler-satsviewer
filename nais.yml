@@ -31,14 +31,7 @@ spec:
   accessPolicy:
     outbound:
       rules:
-        - application: pensjon-regler
-          namespace: q0
-        - application: pensjon-regler
-          namespace: q1
-        - application: pensjon-regler
-          namespace: q2
-        - application: pensjon-regler
-          namespace: q5
+        - application: pensjon-regler-q2
   ingresses:
     - "https://pensjon-regler-satsviewer.intern.dev.nav.no"
     - "https://pensjon-regler-satsviewer.ansatt.dev.nav.no"
