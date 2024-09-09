@@ -30,8 +30,8 @@ spec:
       memory: "512Mi"
   accessPolicy:
     outbound:
-      external:
-        - host: pensjon-regler
+      rules:
+        - application: pensjon-regler
   ingresses:
     - "https://pensjon-regler-satsviewer.intern.dev.nav.no"
     - "https://pensjon-regler-satsviewer.ansatt.dev.nav.no"
