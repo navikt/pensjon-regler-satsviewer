@@ -36,10 +36,10 @@ jobs:
           docker tag $(cat .docker_image):$(cat .docker_tag) $(cat .docker_image):latest
           docker push $(cat .docker_image):latest
           echo "IMAGE=$(cat .docker_image):$(cat .docker_tag)" >> $GITHUB_ENV
-      - name: Deploy to dev-fss
+      - name: Deploy to dev-gcp
         uses: nais/deploy/actions/deploy@v2
         env:
-          CLUSTER: dev-fss
+          CLUSTER: dev-gcp
           RESOURCE: nais.yml
           IMAGE: ${{ env.IMAGE }}
           TEAM: pensjon-regler

@@ -28,5 +28,10 @@ spec:
     requests:
       cpu: "100m"
       memory: "512Mi"
+  accessPolicy:
+    outbound:
+      external:
+        - host: pensjon-regler
   ingresses:
-    - "https://pensjon-regler-satsviewer.dev.adeo.no"
+    - "https://pensjon-regler-satsviewer.intern.dev.nav.no"
+    - "https://pensjon-regler-satsviewer.ansatt.dev.nav.no"
