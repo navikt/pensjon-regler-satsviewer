@@ -1,42 +1,43 @@
-import { useEffect, FC } from "react";
-import { Accordion, Loader, Table } from "@navikt/ds-react";
-import { skjermingstilleggSats } from "../../constants/Constants";
-import { querySatsTabellByMiljøAndTypeAndAktiv } from "../../service/Queries";
+import {FC, useEffect} from "react";
+import {Accordion, Loader, Table} from "@navikt/ds-react";
+import {skjermingstilleggSats} from "../../constants/Constants";
+import {querySatsTabellByMiljøAndTypeAndAktiv} from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
-import { useQueryClient } from '@tanstack/react-query';
+import {useQueryClient, UseQueryResult} from '@tanstack/react-query';
+import {Sats, SkjermingstilleggSats} from "../../model";
 
 interface SkjermingsTilleggTabellProps {
     environment: string;
     satstabell: string;
 }
 
-interface Rad {
-    satsFom: number[];
-    satsTom: number[];
-    value: number;
-}
-
-const SkjermingsTilleggTabell: FC<SkjermingsTilleggTabellProps> = ({ environment, satstabell }) => {
+const SkjermingsTilleggTabell: FC<SkjermingsTilleggTabellProps> = ({environment, satstabell}) => {
 
     const type = skjermingstilleggSats;
     const queryClient = useQueryClient();
 
     useEffect(() => {
-        queryClient.invalidateQueries({ queryKey: ['satsTabell'] });
+        queryClient.invalidateQueries({queryKey: ['satsTabell']});
     }, [satstabell]);
 
-    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell);
+    const {
+        data,
+        isError,
+        isLoading,
+        isSuccess,
+        isFetching
+    } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell) as UseQueryResult<SkjermingstilleggSats>;
 
     if (isError) {
         throw new Error(`Det oppstod en feil ved henting av satsTabell mot miljø ${environment}.`);
     }
 
     if (isLoading) {
-        return <Loader size="3xlarge" title="Laster ..." className="loader" />
+        return <Loader size="3xlarge" title="Laster ..." className="loader"/>
     }
 
     if (isFetching) {
-        return <Loader size="3xlarge" title="Laster ..." className="loader" />;
+        return <Loader size="3xlarge" title="Laster ..." className="loader"/>;
     }
 
     return (
@@ -56,18 +57,18 @@ const SkjermingsTilleggTabell: FC<SkjermingsTilleggTabellProps> = ({ environment
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {data?.map((rad: Rad, key: number) => {
+                                {data.satser.map((rad: Sats, key: number) => {
                                     return (
                                         <Table.Row key={key}>
-                                            <Table.DataCell>{((rad?.satsFom[0]) < 0) ? 'N/A' : (rad?.satsFom[2] + '-' + rad?.satsFom[1] + '-' + rad?.satsFom[0])}</Table.DataCell>
-                                            <Table.DataCell>{((rad?.satsTom[0]) > 10000) ? 'N/A' : (rad?.satsTom[2] + '-' + rad?.satsTom[1] + '-' + rad?.satsTom[0])}</Table.DataCell>
-                                            <Table.DataCell>{rad?.value}</Table.DataCell>
+                                            <Table.DataCell>{((rad.satsFom[0]) < 0) ? 'N/A' : (rad.satsFom[2] + '-' + rad.satsFom[1] + '-' + rad.satsFom[0])}</Table.DataCell>
+                                            <Table.DataCell>{((rad.satsTom[0]) > 10000) ? 'N/A' : (rad.satsTom[2] + '-' + rad.satsTom[1] + '-' + rad.satsTom[0])}</Table.DataCell>
+                                            <Table.DataCell>{rad.value}</Table.DataCell>
                                         </Table.Row>
                                     )
                                 })}
                             </Table.Body>
                         </Table> :
-                        <DefaultTable />
+                        <DefaultTable/>
                     }
                 </Accordion.Content>
             </Accordion.Item>

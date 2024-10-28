@@ -3,34 +3,12 @@ import { Accordion, Loader, Table } from "@navikt/ds-react";
 import { uføretrygdMinsteytelseSats } from "../../constants/Constants";
 import { querySatsTabellByMiljøAndTypeAndAktiv } from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
-import { useQueryClient } from '@tanstack/react-query';
+import {useQueryClient, UseQueryResult} from '@tanstack/react-query';
+import {UforetrygdMinsteytelseSats, UforetrygdMinsteytelseSatser} from "../../model";
 
 interface UføretrygdMinsteytelseTabellProps {
     environment: string;
     satstabell: string;
-}
-
-interface SatsType {
-    kode: string;
-    er_gyldig: boolean;
-}
-
-interface SatsMinsteytelse {
-    sats: number;
-    satsType: SatsType;
-    benyttetUngUfor: boolean;
-    oppfyltUngUfor: boolean;
-    eksportForbudUngUfor: boolean;
-}
-
-interface Rad {
-    satsFom: number[];
-    satsTom: number[];
-    uftKonv: boolean;
-    beregnesSomGift: boolean;
-    ungUfor: boolean;
-    forsorgerEktefelleOver60: boolean;
-    satsMinsteytelse: SatsMinsteytelse;
 }
 
 const UføretrygdMinsteytelseTabell: FC<UføretrygdMinsteytelseTabellProps> = ({ environment, satstabell }) => {
@@ -42,7 +20,7 @@ const UføretrygdMinsteytelseTabell: FC<UføretrygdMinsteytelseTabellProps> = ({
         queryClient.invalidateQueries({ queryKey: ['satsTabell'] });
     }, [satstabell]);
 
-    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell);
+    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell) as UseQueryResult<UforetrygdMinsteytelseSatser>;
 
     if (isError) {
         throw new Error(`Det oppstod en feil ved henting av satsTabell mot miljø ${environment}.`);
@@ -78,17 +56,17 @@ const UføretrygdMinsteytelseTabell: FC<UføretrygdMinsteytelseTabellProps> = ({
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {data?.map((rad: Rad, key: number) => {
+                                {data.satser.map((rad: UforetrygdMinsteytelseSats, key: number) => {
                                     return (
                                         <Table.Row key={key}>
-                                            <Table.DataCell>{((rad?.satsFom[0]) < 0) ? 'N/A' : (rad?.satsFom[2] + '-' + rad?.satsFom[1] + '-' + rad?.satsFom[0])}</Table.DataCell>
-                                            <Table.DataCell>{((rad?.satsTom[0]) > 10000) ? 'N/A' : (rad?.satsTom[2] + '-' + rad?.satsTom[1] + '-' + rad?.satsTom[0])}</Table.DataCell>
+                                            <Table.DataCell>{((rad.satsFom[0]) < 0) ? 'N/A' : (rad.satsFom[2] + '-' + rad.satsFom[1] + '-' + rad.satsFom[0])}</Table.DataCell>
+                                            <Table.DataCell>{((rad.satsTom[0]) > 10000) ? 'N/A' : (rad.satsTom[2] + '-' + rad.satsTom[1] + '-' + rad.satsTom[0])}</Table.DataCell>
                                             <Table.DataCell>{(rad?.uftKonv !== undefined ? rad?.uftKonv.toString() : '*')}</Table.DataCell>
-                                            <Table.DataCell>{(rad?.beregnesSomGift !== undefined ? rad?.beregnesSomGift.toString() : '*')}</Table.DataCell>
-                                            <Table.DataCell>{(rad?.ungUfor !== undefined ? rad?.ungUfor.toString() : '*')}</Table.DataCell>
-                                            <Table.DataCell>{(rad?.forsorgerEktefelleOver60 !== undefined ? rad?.forsorgerEktefelleOver60.toString() : '*')}</Table.DataCell>
-                                            <Table.DataCell>{rad?.satsMinsteytelse?.sats}</Table.DataCell>
-                                            <Table.DataCell>{rad?.satsMinsteytelse?.satsType?.kode}</Table.DataCell>
+                                            <Table.DataCell>{(rad.beregnesSomGift !== undefined ? rad.beregnesSomGift.toString() : '*')}</Table.DataCell>
+                                            <Table.DataCell>{(rad.ungUfor !== undefined ? rad.ungUfor.toString() : '*')}</Table.DataCell>
+                                            <Table.DataCell>{(rad.forsorgerEktefelleOver60 !== undefined ? rad.forsorgerEktefelleOver60.toString() : '*')}</Table.DataCell>
+                                            <Table.DataCell>{rad.satsMinsteytelse?.sats}</Table.DataCell>
+                                            <Table.DataCell>{rad.satsMinsteytelse.satsType}</Table.DataCell>
                                         </Table.Row>
                                     )
                                 })}
