@@ -140,3 +140,7 @@ export type SatserType =
     | BarnetilleggTak2016Satser
     | NordiskKonvensjonsLandSatser
     | EosKonvensjonsLandSatser;
+
+export interface Satser {
+    satser: string[];
+}

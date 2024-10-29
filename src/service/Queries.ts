@@ -1,8 +1,8 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import {SatserType} from "../model";
+import {Satser, SatserType} from "../model";
 
 interface FetchResponse {
-    json: () => Promise<any>;
+    json: () => Promise<unknown>;
     text: () => Promise<string>;
 }
 
@@ -30,7 +30,7 @@ export const fetchAktivSatsTabellByMiljø = async (environment: string): Promise
     return response.text();
 };
 
-export const fetchAlleSatstabellerByMiljø = async (environment: string): Promise<SatserType> => {
+export const fetchAlleSatstabellerByMiljø = async (environment: string): Promise<Satser> => {
     const response: FetchResponse = await fetch(`https://pensjon-regler-${environment}.dev.adeo.no/alleSatstabeller`,
         {
             headers: {
@@ -41,7 +41,7 @@ export const fetchAlleSatstabellerByMiljø = async (environment: string): Promis
 
     const data = await response.json()
 
-    return { satser: data } as SatserType
+    return { satser: data } as Satser;
 
 }
 

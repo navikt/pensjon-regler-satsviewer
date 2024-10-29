@@ -41,7 +41,7 @@ const SatsKontroller: FC<SatsKontrollerProps> = ({ environment, onSatsChange }) 
                     onSatsChange(event.target.value);
                 }}>
                     <option value="">Velg PROD sats</option>
-                    {data[1].filter(prodFilter).map((sats: string) => (
+                    {data?.satser.filter(prodFilter).map((sats: string) => (
                         <option key={sats} value={sats}>
                             {sats}
                         </option>
@@ -54,7 +54,7 @@ const SatsKontroller: FC<SatsKontrollerProps> = ({ environment, onSatsChange }) 
                     onSatsChange(event.target.value);
                 }}>
                     <option value="">Velg TEST sats</option>
-                    {data[1].filter(testFilter).map((sats: string) => (
+                    {data?.satser.filter(testFilter).map((sats: string) => (
                         <option key={sats} value={sats}>
                             {sats}
                         </option>
@@ -67,7 +67,7 @@ const SatsKontroller: FC<SatsKontrollerProps> = ({ environment, onSatsChange }) 
                     onSatsChange(event.target.value);
                 }}>
                     <option value="">Velg øvrig sats</option>
-                    {data[1].filter(andreFilter).map((sats: string) => (
+                    {data?.satser.filter(andreFilter).map((sats: string) => (
                         <option key={sats} value={sats}>
                             {sats}
                         </option>

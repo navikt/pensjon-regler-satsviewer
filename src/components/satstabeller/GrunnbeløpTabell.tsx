@@ -35,10 +35,6 @@ const GrunnbeløpTabell: FC<GrunnbeløpTabellProps> = ({environment, satstabell}
         return <Loader size="3xlarge" title="Laster ..." className="loader"/>;
     }
 
-    if (isSuccess) {
-        console.log("GrunnbeløpTabell: ", data?.satser);
-    }
-
     return (
         <Accordion>
             <Accordion.Item>
