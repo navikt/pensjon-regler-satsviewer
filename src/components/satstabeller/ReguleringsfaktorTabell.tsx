@@ -3,17 +3,12 @@ import { Accordion, Loader, Table } from "@navikt/ds-react";
 import { reguleringsFaktorSats } from "../../constants/Constants";
 import { querySatsTabellByMiljøAndTypeAndAktiv } from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
-import { useQueryClient } from '@tanstack/react-query';
+import {useQueryClient, UseQueryResult} from '@tanstack/react-query';
+import {ReguleringsfaktorSatser, Sats} from "../../model";
 
 interface ReguleringsfaktorTabellProps {
     environment: string;
     satstabell: string;
-}
-
-interface Rad {
-    satsFom: number[];
-    satsTom: number[];
-    value: number;
 }
 
 const ReguleringsfaktorTabell: FC<ReguleringsfaktorTabellProps> = ({ environment, satstabell }) => {
@@ -25,7 +20,7 @@ const ReguleringsfaktorTabell: FC<ReguleringsfaktorTabellProps> = ({ environment
         queryClient.invalidateQueries({ queryKey: ['satsTabell'] });
     }, [satstabell]);
 
-    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell);
+    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell) as UseQueryResult<ReguleringsfaktorSatser>;
 
     if (isError) {
         throw new Error(`Det oppstod en feil ved henting av satsTabell mot miljø ${environment}.`);
@@ -56,12 +51,12 @@ const ReguleringsfaktorTabell: FC<ReguleringsfaktorTabellProps> = ({ environment
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {data?.map((rad: Rad, key: number) => {
+                                {data.satser.map((rad: Sats, key: number) => {
                                     return (
                                         <Table.Row key={key}>
-                                            <Table.DataCell>{((rad?.satsFom[0]) < 0) ? 'N/A' : (rad?.satsFom[2] + '-' + rad?.satsFom[1] + '-' + rad?.satsFom[0])}</Table.DataCell>
-                                            <Table.DataCell>{((rad?.satsTom[0]) > 10000) ? 'N/A' : (rad?.satsTom[2] + '-' + rad?.satsTom[1] + '-' + rad?.satsTom[0])}</Table.DataCell>
-                                            <Table.DataCell>{rad?.value}</Table.DataCell>
+                                            <Table.DataCell>{((rad.satsFom[0]) < 0) ? 'N/A' : (rad.satsFom[2] + '-' + rad.satsFom[1] + '-' + rad.satsFom[0])}</Table.DataCell>
+                                            <Table.DataCell>{((rad.satsTom[0]) > 10000) ? 'N/A' : (rad.satsTom[2] + '-' + rad.satsTom[1] + '-' + rad.satsTom[0])}</Table.DataCell>
+                                            <Table.DataCell>{rad.value}</Table.DataCell>
                                         </Table.Row>
                                     )
                                 })}

@@ -3,23 +3,12 @@ import { Accordion, Loader, Table } from "@navikt/ds-react";
 import { minstePensjonsNivåSats } from "../../constants/Constants";
 import { querySatsTabellByMiljøAndTypeAndAktiv } from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
-import { useQueryClient } from '@tanstack/react-query';
+import {useQueryClient, UseQueryResult} from '@tanstack/react-query';
+import {MinePensjonsnivaaSatser, MinstePensjonsnivaaSats} from "../../model";
 
 interface MinstePensjonsnivåTabellProps {
     environment: string;
     satstabell: string;
-}
-
-interface Rad {
-    satsFom: number[];
-    satsTom: number[];
-    kodeMap: {
-        LAV: number;
-        ORDINAER: number;
-        HOY: number;
-        HOY_ENSLIG: number;
-        SAERSKILT: number;
-    }
 }
 
 const MinstePensjonsnivåTabell: FC<MinstePensjonsnivåTabellProps> = ({ environment, satstabell }) => {
@@ -31,7 +20,7 @@ const MinstePensjonsnivåTabell: FC<MinstePensjonsnivåTabellProps> = ({ environ
         queryClient.invalidateQueries({ queryKey: ['satsTabell'] });
     }, [satstabell]);
 
-    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, true, satstabell);
+    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, true, satstabell) as UseQueryResult<MinePensjonsnivaaSatser>;
 
     if (isError) {
         throw new Error(`Det oppstod en feil ved henting av satsTabell mot miljø ${environment}.`);
@@ -66,16 +55,16 @@ const MinstePensjonsnivåTabell: FC<MinstePensjonsnivåTabellProps> = ({ environ
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {data?.map((rad: Rad, key: number) => {
+                                {data.satser.map((rad: MinstePensjonsnivaaSats, key: number) => {
                                     return (
                                         <Table.Row key={key}>
-                                            <Table.DataCell>{((rad?.satsFom[0]) < 0) ? 'N/A' : (rad?.satsFom[2] + '-' + rad?.satsFom[1] + '-' + rad?.satsFom[0])}</Table.DataCell>
-                                            <Table.DataCell>{((rad?.satsTom[0]) > 10000) ? 'N/A' : (rad?.satsTom[2] + '-' + rad?.satsTom[1] + '-' + rad?.satsTom[0])}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap?.LAV}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap?.ORDINAER}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap?.HOY}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap?.HOY_ENSLIG}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap?.SAERSKILT}</Table.DataCell>
+                                            <Table.DataCell>{((rad.satsFom[0]) < 0) ? 'N/A' : (rad.satsFom[2] + '-' + rad.satsFom[1] + '-' + rad.satsFom[0])}</Table.DataCell>
+                                            <Table.DataCell>{((rad.satsTom[0]) > 10000) ? 'N/A' : (rad.satsTom[2] + '-' + rad.satsTom[1] + '-' + rad.satsTom[0])}</Table.DataCell>
+                                            <Table.DataCell>{rad.kodeMap?.LAV}</Table.DataCell>
+                                            <Table.DataCell>{rad.kodeMap?.ORDINAER}</Table.DataCell>
+                                            <Table.DataCell>{rad.kodeMap?.HOY}</Table.DataCell>
+                                            <Table.DataCell>{rad.kodeMap?.HOY_ENSLIG}</Table.DataCell>
+                                            <Table.DataCell>{rad.kodeMap?.SAERSKILT}</Table.DataCell>
                                         </Table.Row>
                                     )
                                 })}

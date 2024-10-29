@@ -1,23 +1,14 @@
-import { useEffect, FC } from "react";
-import { Accordion, Loader, Table } from "@navikt/ds-react";
-import { særtilleggSats } from "../../constants/Constants";
-import { querySatsTabellByMiljøAndTypeAndAktiv } from "../../service/Queries";
+import {FC, useEffect} from "react";
+import {Accordion, Loader, Table} from "@navikt/ds-react";
+import {særtilleggSats} from "../../constants/Constants";
+import {querySatsTabellByMiljøAndTypeAndAktiv} from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
-import { useQueryClient } from '@tanstack/react-query';
+import {useQueryClient, UseQueryResult} from '@tanstack/react-query';
+import {SaertilleggSats, SaertilleggSatser} from "../../model";
 
 interface SærtilleggTabellProps {
     environment: string;
     satstabell: string;
-}
-
-interface Rad {
-    satsFom: number[];
-    satsTom: number[];
-    kodeMap: {
-            Minste: number;
-            Ordinær: number;
-            Forhøyet: number;
-        };
 }
 
 const SærtilleggTabell: FC<SærtilleggTabellProps> = ({ environment, satstabell }) => {
@@ -29,7 +20,7 @@ const SærtilleggTabell: FC<SærtilleggTabellProps> = ({ environment, satstabell
         queryClient.invalidateQueries({ queryKey: ['satsTabell'] });
     }, [satstabell]);
 
-    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell);
+    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell) as UseQueryResult<SaertilleggSatser>;
 
     if (isError) {
         throw new Error(`Det oppstod en feil ved henting av satsTabell mot miljø ${environment}.`);
@@ -62,14 +53,14 @@ const SærtilleggTabell: FC<SærtilleggTabellProps> = ({ environment, satstabell
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {data?.map((rad: Rad, key: number) => {
+                                {data.satser.map((rad: SaertilleggSats, key: number) => {
                                     return (
                                         <Table.Row key={key}>
-                                            <Table.DataCell>{((rad?.satsFom[0]) < 0) ? 'N/A' : (rad?.satsFom[2] + '-' + rad?.satsFom[1] + '-' + rad?.satsFom[0])}</Table.DataCell>
-                                            <Table.DataCell>{((rad?.satsTom[0]) > 10000) ? 'N/A' : (rad?.satsTom[2] + '-' + rad?.satsTom[1] + '-' + rad?.satsTom[0])}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap?.Minste}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap?.Ordinær}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap?.Forhøyet}</Table.DataCell>
+                                            <Table.DataCell>{((rad.satsFom[0]) < 0) ? 'N/A' : (rad.satsFom[2] + '-' + rad.satsFom[1] + '-' + rad.satsFom[0])}</Table.DataCell>
+                                            <Table.DataCell>{((rad.satsTom[0]) > 10000) ? 'N/A' : (rad.satsTom[2] + '-' + rad.satsTom[1] + '-' + rad.satsTom[0])}</Table.DataCell>
+                                            <Table.DataCell>{rad.kodeMap.Minste}</Table.DataCell>
+                                            <Table.DataCell>{rad.kodeMap.Ordinaer}</Table.DataCell>
+                                            <Table.DataCell>{rad.kodeMap.Forhoyet}</Table.DataCell>
                                         </Table.Row>
                                     )
                                 })}

@@ -3,22 +3,12 @@ import { Accordion, Loader, Table } from "@navikt/ds-react";
 import { rettsgebyrSats } from "../../constants/Constants";
 import { querySatsTabellByMiljøAndTypeAndAktiv } from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
-import { useQueryClient } from '@tanstack/react-query';
+import {useQueryClient, UseQueryResult} from '@tanstack/react-query';
+import {RettsgebyrSats, RettsgebyrSatser} from "../../model";
 
 interface RettsgebyrTabellProps {
     environment: string;
     satstabell: string;
-}
-
-interface Rad {
-    satsFom: number[];
-    satsTom: number[];
-    kodeMap: {
-        RETTSGEBYR: number;
-        TOL_GR_EO_ETTERBET: number;
-        TOL_GR_EO_TILBAKEKR: number;
-        TERSKEL_FEILUTBET: number;
-        };
 }
 
 const RettsgebyrTabell: FC<RettsgebyrTabellProps> = ({ environment, satstabell }) => {
@@ -30,7 +20,7 @@ const RettsgebyrTabell: FC<RettsgebyrTabellProps> = ({ environment, satstabell }
         queryClient.invalidateQueries({ queryKey: ['satsTabell'] });
     }, [satstabell]);
 
-    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell);
+    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell) as UseQueryResult<RettsgebyrSatser>;
 
     if (isError) {
         throw new Error(`Det oppstod en feil ved henting av satsTabell mot miljø ${environment}.`);
@@ -64,15 +54,15 @@ const RettsgebyrTabell: FC<RettsgebyrTabellProps> = ({ environment, satstabell }
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {data?.map((rad: Rad, key: number) => {
+                                {data.satser.map((rad: RettsgebyrSats, key: number) => {
                                     return (
                                         <Table.Row key={key}>
-                                            <Table.DataCell>{((rad?.satsFom[0]) < 0) ? 'N/A' : (rad?.satsFom[2] + '-' + rad?.satsFom[1] + '-' + rad?.satsFom[0])}</Table.DataCell>
-                                            <Table.DataCell>{((rad?.satsTom[0]) > 10000) ? 'N/A' : (rad?.satsTom[2] + '-' + rad?.satsTom[1] + '-' + rad?.satsTom[0])}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap?.RETTSGEBYR}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap?.TOL_GR_EO_ETTERBET}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap?.TOL_GR_EO_TILBAKEKR}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap?.TERSKEL_FEILUTBET}</Table.DataCell>
+                                            <Table.DataCell>{((rad.satsFom[0]) < 0) ? 'N/A' : (rad.satsFom[2] + '-' + rad.satsFom[1] + '-' + rad.satsFom[0])}</Table.DataCell>
+                                            <Table.DataCell>{((rad.satsTom[0]) > 10000) ? 'N/A' : (rad.satsTom[2] + '-' + rad.satsTom[1] + '-' + rad.satsTom[0])}</Table.DataCell>
+                                            <Table.DataCell>{rad.kodeMap?.RETTSGEBYR}</Table.DataCell>
+                                            <Table.DataCell>{rad.kodeMap?.TOL_GR_EO_ETTERBET}</Table.DataCell>
+                                            <Table.DataCell>{rad.kodeMap?.TOL_GR_EO_TILBAKEKR}</Table.DataCell>
+                                            <Table.DataCell>{rad.kodeMap?.TERSKEL_FEILUTBET}</Table.DataCell>
                                         </Table.Row>
                                     )
                                 })}

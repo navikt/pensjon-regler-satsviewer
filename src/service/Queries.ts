@@ -1,11 +1,12 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import {SatserType} from "../model";
 
 interface FetchResponse {
     json: () => Promise<any>;
     text: () => Promise<string>;
 }
 
-const fetchSatsByTabellByMiljøAndTypeAndAktivAndSatstabell = async (environment: string, type: string, aktiv: boolean, satstabell: string): Promise<any> => {
+const fetchSatsByTabellByMiljøAndTypeAndAktivAndSatstabell = async (environment: string, type: string, aktiv: boolean, satstabell: string): Promise<SatserType> => {
     const response: FetchResponse = await fetch(`https://pensjon-regler-${environment}.dev.adeo.no/api/${type}?Aktiv=${aktiv}&Satstabell=${satstabell}`,
         {
             headers: {
@@ -14,11 +15,8 @@ const fetchSatsByTabellByMiljøAndTypeAndAktivAndSatstabell = async (environment
             }
         });
     const data = await response.json();
-    if ( data[0] != undefined && data[0].length > 1 ) {
-        return data[1]
-    } else {
-        return data
-    }
+    return { satser: data } as SatserType;
+
 }
 
 export const fetchAktivSatsTabellByMiljø = async (environment: string): Promise<string> => {
@@ -32,7 +30,7 @@ export const fetchAktivSatsTabellByMiljø = async (environment: string): Promise
     return response.text();
 };
 
-export const fetchAlleSatstabellerByMiljø = async (environment: string): Promise<any> => {
+export const fetchAlleSatstabellerByMiljø = async (environment: string): Promise<SatserType> => {
     const response: FetchResponse = await fetch(`https://pensjon-regler-${environment}.dev.adeo.no/alleSatstabeller`,
         {
             headers: {
@@ -41,18 +39,13 @@ export const fetchAlleSatstabellerByMiljø = async (environment: string): Promis
             }
         });
 
-    return response.json();
+    const data = await response.json()
+
+    return { satser: data } as SatserType
 
 }
 
-export const queryAktivSatsTabellByMiljø = (environment: string): UseQueryResult<any, unknown> => useQuery({
-    queryKey: ['environment', environment],
-    queryFn: () => fetchAktivSatsTabellByMiljø(environment),
-    throwOnError: true,
-    enabled: !!environment
-});
-
-export const querySatsTabellByMiljøAndTypeAndAktiv = (environment: string, type: string, aktiv: boolean, satsTabell: string): UseQueryResult<any, unknown> => useQuery({
+export const querySatsTabellByMiljøAndTypeAndAktiv = (environment: string, type: string, aktiv: boolean, satsTabell: string): UseQueryResult<SatserType, unknown> => useQuery({
     queryKey: ['satsTabell', environment, type, aktiv, satsTabell],
     queryFn: () => fetchSatsByTabellByMiljøAndTypeAndAktivAndSatstabell(environment, type, aktiv, satsTabell),
     throwOnError: true,

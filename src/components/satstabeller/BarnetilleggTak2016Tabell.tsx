@@ -3,20 +3,12 @@ import { Accordion, Loader, Table } from "@navikt/ds-react";
 import { barnetilleggTak2016Sats } from "../../constants/Constants";
 import { querySatsTabellByMiljøAndTypeAndAktiv } from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
-import { useQueryClient } from '@tanstack/react-query';
+import {useQueryClient, UseQueryResult} from '@tanstack/react-query';
+import {BarnetilleggTak2016Sats, BarnetilleggTak2016Satser} from "../../model";
 
 interface BarnetilleggTak2016TabellProps {
     environment: string;
     satstabell: string;
-}
-
-interface Rad {
-    satsFom: number[];
-    satsTom: number[];
-    kodeMap: {
-        ORDINÆR: number;
-        OVERGANGSREGLER: number;
-    };
 }
 
 const BarnetilleggTak2016Tabell: FC<BarnetilleggTak2016TabellProps> = ({ environment, satstabell }) => {
@@ -28,7 +20,7 @@ const BarnetilleggTak2016Tabell: FC<BarnetilleggTak2016TabellProps> = ({ environ
         queryClient.invalidateQueries({ queryKey: ['satsTabell'] });
     }, [satstabell]);
 
-    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell);
+    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell) as UseQueryResult<BarnetilleggTak2016Satser>;
 
     if (isError) {
         throw new Error(`Det oppstod en feil ved henting av satsTabell mot miljø ${environment}.`);
@@ -60,13 +52,13 @@ const BarnetilleggTak2016Tabell: FC<BarnetilleggTak2016TabellProps> = ({ environ
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {data?.map((rad: Rad, key: number) => {
+                                {data.satser.map((rad: BarnetilleggTak2016Sats, key: number) => {
                                     return (
                                         <Table.Row key={key}>
-                                            <Table.DataCell>{((rad?.satsFom[0]) < 0) ? 'N/A' : (rad?.satsFom[2] + '-' + rad?.satsFom[1] + '-' + rad?.satsFom[0])}</Table.DataCell>
-                                            <Table.DataCell>{((rad?.satsTom[0]) > 10000) ? 'N/A' : (rad?.satsTom[2] + '-' + rad?.satsTom[1] + '-' + rad?.satsTom[0])}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap?.ORDINÆR}</Table.DataCell>
-                                            <Table.DataCell>{rad?.kodeMap?.OVERGANGSREGLER}</Table.DataCell>
+                                            <Table.DataCell>{((rad.satsFom[0]) < 0) ? 'N/A' : (rad.satsFom[2] + '-' + rad.satsFom[1] + '-' + rad.satsFom[0])}</Table.DataCell>
+                                            <Table.DataCell>{((rad.satsTom[0]) > 10000) ? 'N/A' : (rad.satsTom[2] + '-' + rad.satsTom[1] + '-' + rad.satsTom[0])}</Table.DataCell>
+                                            <Table.DataCell>{rad.kodeMap.ORDINÆR}</Table.DataCell>
+                                            <Table.DataCell>{rad.kodeMap.OVERGANGSREGLER}</Table.DataCell>
                                         </Table.Row>
                                     )
                                 })}
