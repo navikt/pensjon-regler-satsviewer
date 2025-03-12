@@ -65,13 +65,16 @@ jobs:
       pull-requests: write
       id-token: write
     steps:
+      - name: Generate tag
+        id: tag
+        run: echo "TAG=$(date +%Y-%m-%d-%H-%M-%S)-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v4
       - name: Build and push image and SBOM to OCI registry
         uses: nais/docker-build-push@v0
         id: docker-build-push
         with:
           team: pensjon-regler
-          tag: $(date "+%Y-%m-%d-%H-%M-%S")-$(git rev-parse --short HEAD)
+          tag: ${{ steps.tag.outputs.TAG }}
       - name: Deploy to Nais
         uses: nais/deploy/actions/deploy@v2
         env:
