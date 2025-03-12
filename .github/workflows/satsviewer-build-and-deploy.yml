@@ -68,8 +68,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Generate tag
         id: tag
+        env:
+          TZ: Europe/Oslo
         run: |
-          timestamp=$(date -u '+%Y.%m.%d-%H.%M')
+          timestamp=$(TZ=Europe/Oslo date '+%Y.%m.%d-%H.%M')
           sha=$(git rev-parse --short HEAD)
           echo "TAG=${timestamp}-${sha}" >> $GITHUB_OUTPUT
           echo "Debug - Generated tag value:"
@@ -83,6 +85,7 @@ jobs:
       - name: Deploy to Nais
         uses: nais/deploy/actions/deploy@v2
         env:
+          TZ: Europe/Oslo
           CLUSTER: dev-gcp
           RESOURCE: nais.yml
           VAR: image=${{ steps.docker-build-push.outputs.image }}
