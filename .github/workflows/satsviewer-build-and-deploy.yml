@@ -67,6 +67,8 @@ jobs:
     steps:
       - name: Generate tag
         id: tag
+        env:
+          TZ: Europe/Oslo
         run: echo "TAG=$(date +%Y-%m-%d-%H-%M-%S)-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v4
       - name: Build and push image and SBOM to OCI registry
