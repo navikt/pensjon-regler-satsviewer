@@ -82,6 +82,8 @@ jobs:
         with:
           team: pensjon-regler
           tag: ${{ steps.tag.outputs.TAG }}
+          build_args: | # optional, default empty
+            TZ=Europe/Oslo
       - name: Deploy to Nais
         uses: nais/deploy/actions/deploy@v2
         env:
