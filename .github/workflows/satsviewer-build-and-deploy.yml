@@ -85,6 +85,7 @@ jobs:
       - name: Deploy to Nais
         uses: nais/deploy/actions/deploy@v2
         env:
+          TZ: Europe/Oslo
           CLUSTER: dev-gcp
           RESOURCE: nais.yml
           VAR: image=${{ steps.docker-build-push.outputs.image }}
