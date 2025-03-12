@@ -74,6 +74,8 @@ jobs:
           timestamp=$(TZ=Europe/Oslo date '+%Y.%m.%d-%H.%M')
           sha=$(git rev-parse --short HEAD)
           echo "TAG=${timestamp}-${sha}" >> $GITHUB_OUTPUT
+          echo "Debug - Generated tag value:"
+          cat $GITHUB_OUTPUT
       - name: Build and push image and SBOM to OCI registry
         uses: nais/docker-build-push@v0
         id: docker-build-push
