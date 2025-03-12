@@ -32,11 +32,17 @@ jobs:
         with:
           team: pensjon-regler
           tag: ${{ steps.tag.outputs.TAG }}
+      - name: Replace tag in image
+        id: replace-tag
+        run: |
+          original_image="${{ steps.docker-build-push.outputs.image }}"
+          new_image="${original_image%:*}:${{ steps.tag.outputs.TAG }}"
+          echo "IMAGE=${new_image}" >> $GITHUB_OUTPUT
       - name: Deploy to Nais
         uses: nais/deploy/actions/deploy@v2
         env:
           TZ: Europe/Oslo
           CLUSTER: dev-gcp
           RESOURCE: nais.yml
-          VAR: image=${{ steps.docker-build-push.outputs.image }}:${{ steps.tag.outputs.TAG }}
+          VAR: image=${{ steps.replace-tag.outputs.IMAGE }}
           TELEMETRY: ${{ steps.docker-build-push.outputs.telemetry }}
