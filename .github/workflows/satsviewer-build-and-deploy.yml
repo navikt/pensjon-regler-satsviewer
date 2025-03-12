@@ -22,7 +22,7 @@ jobs:
         env:
           TZ: Europe/Oslo
         run: |
-          timestamp=$(TZ=Europe/Oslo date '+%Y.%m.%d-%H:%M')
+          timestamp=$(TZ=Europe/Oslo date '+%Y.%m.%d-%H%M')
           sha=$(git rev-parse --short HEAD)
           echo "TAG=${timestamp}-${sha}" >> $GITHUB_OUTPUT
           echo "Debug - Generated tag value:"
