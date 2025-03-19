@@ -1,0 +1,25 @@
+name: Deploy Image
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag (e.g., 2025-03-07-10-48-53-6ed3d63)'
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    name: Deploy to Nais
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Nais
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          TZ: Europe/Oslo
+          CLUSTER: dev-gcp
+          RESOURCE: nais.yml
+          VAR: image=europe-north1-docker.pkg.dev/nais-management-233d/pensjon-regler/pensjon-regler-satsviewer:${{ github.event.inputs.tag }}
