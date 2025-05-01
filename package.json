@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@navikt/ds-css": "^7.20.0",
-    "@navikt/ds-react": "^7.20.0",
+    "@navikt/ds-react": "^7.21.0",
     "@tanstack/react-query": "^5.74.7",
     "react": "^19.0.0",
     "react-dom": "^19.1.0",
