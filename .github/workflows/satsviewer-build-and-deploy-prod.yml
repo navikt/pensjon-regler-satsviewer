@@ -1,4 +1,4 @@
-name: Build and deploy
+name: Build and deploy prod gcp
 on:
   push:
     branches:
@@ -44,14 +44,6 @@ jobs:
         env:
           TZ: Europe/Oslo
           CLUSTER: prod-gcp
-          RESOURCE: nais-prod.yml
-          VAR: image=${{ steps.replace-tag.outputs.IMAGE }}
-          TELEMETRY: ${{ steps.docker-build-push.outputs.telemetry }}
-      - name: Deploy to Nais fss
-        uses: nais/deploy/actions/deploy@v2
-        env:
-          TZ: Europe/Oslo
-          CLUSTER: prod-fss
           RESOURCE: nais-prod.yml
           VAR: image=${{ steps.replace-tag.outputs.IMAGE }}
           TELEMETRY: ${{ steps.docker-build-push.outputs.telemetry }}
