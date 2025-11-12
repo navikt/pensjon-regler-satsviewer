@@ -20,7 +20,5 @@ jobs:
         with:
           token: ${{ github.token }}
           minimum-age-of-pr: "0.25"     # ~6 hours
-          # merge only these semver levels (default is patch,minor anyway)
           semver-filter: "patch,minor"
-          # optional: only merge via merge queue-compatible strategy
           merge-method: "merge"
