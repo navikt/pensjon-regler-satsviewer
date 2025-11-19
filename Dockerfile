@@ -1,5 +1,5 @@
 FROM cgr.dev/chainguard/node:latest-dev AS build
-WORKDIR /.
+WORKDIR /
 COPY --chown=node:node package*.json tsconfig*.json vite.config.ts ./
 RUN npm ci
 COPY --chown=node:node . .
