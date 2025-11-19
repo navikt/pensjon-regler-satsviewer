@@ -1,15 +1,12 @@
-# build frontend and server
-FROM node:lts-alpine3.21 as build
+FROM cgr.dev/chainguard/node:latest-dev AS build
 WORKDIR /.
-COPY package.json package-lock.json tsconfig.json tsconfig.node.json vite.config.ts ./
+COPY --chown=node:node package*.json tsconfig*.json vite.config.ts ./
 RUN npm ci
-
-COPY /. ./
+COPY --chown=node:node . .
 RUN npm run build
 
-# production environment
-FROM nginxinc/nginx-unprivileged:stable-alpine
-COPY --from=build /dist /usr/share/nginx/html
-COPY ./config/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+FROM cgr.dev/chainguard/nginx:latest
+COPY --from=build --chown=nonroot:nonroot /dist /usr/share/nginx/html
+COPY --chown=nonroot:nonroot ./config/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
 EXPOSE 8080
-CMD ["nginx", "-g", "daemon off;"]
