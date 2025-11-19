@@ -10,19 +10,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@navikt/ds-css": "^7.33.1",
-    "@navikt/ds-react": "^7.33.2",
-    "@tanstack/react-query": "^5.90.7",
+    "@navikt/ds-css": "^7.33.4",
+    "@navikt/ds-react": "^7.33.3",
+    "@tanstack/react-query": "^5.90.10",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-error-boundary": "^6.0.0"
   },
   "devDependencies": {
-    "@types/react": "^19.2.3",
-    "@types/react-dom": "^19.2.2",
-    "@typescript-eslint/eslint-plugin": "^8.46.3",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.47.0",
     "@typescript-eslint/parser": "^8.46.4",
-    "@vitejs/plugin-react": "^5.1.0",
+    "@vitejs/plugin-react": "^5.1.1",
     "eslint": "^9.39.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
