@@ -15,7 +15,7 @@ jobs:
       actions: read
       id-token: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Deploy to Nais
         uses: nais/deploy/actions/deploy@v2
         env:
