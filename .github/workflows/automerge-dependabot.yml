@@ -1,0 +1,24 @@
+name: Automerge Dependabot
+
+on:
+  pull_request:
+    types: [opened, synchronize, labeled, ready_for_review]
+  schedule:
+    - cron: "0 7 * * *" # daily at 07:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+  statuses: read
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: navikt/automerge-dependabot@main
+        with:
+          token: ${{ github.token }}
+          minimum-age-of-pr: "0.25"     # ~6 hours
+          semver-filter: "patch,minor"
+          merge-method: "merge"
