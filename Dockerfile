@@ -2,6 +2,11 @@
 FROM node:lts-alpine3.21 as build
 WORKDIR /.
 COPY package.json package-lock.json tsconfig.json tsconfig.node.json vite.config.ts ./
+RUN --mount=type=secret,id=NODE_AUTH_TOKEN \
+    npm config set //npm.pkg.github.com/:_authToken=$(cat /run/secrets/NODE_AUTH_TOKEN)
+RUN npm config set @navikt:registry=https://npm.pkg.github.com
+RUN npm install --no-audit --ignore-scripts
+
 RUN npm ci
 
 COPY /. ./
