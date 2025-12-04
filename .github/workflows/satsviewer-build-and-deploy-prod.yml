@@ -16,7 +16,7 @@ jobs:
       pull-requests: write
       id-token: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v5
       - name: Generate tag
         id: tag
         env:
@@ -33,7 +33,6 @@ jobs:
         with:
           team: pensjon-regler
           tag: ${{ steps.tag.outputs.TAG }}
-          build_secrets: NODE_AUTH_TOKEN=${{ secrets.READER_TOKEN }}
       - name: Replace tag in image
         id: replace-tag
         run: |
