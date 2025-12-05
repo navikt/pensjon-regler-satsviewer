@@ -2,8 +2,7 @@ FROM cgr.dev/chainguard/node:latest-dev AS build
 WORKDIR /app
 COPY --chown=node:node package*.json tsconfig*.json vite.config.ts ./
 RUN npm ci
-
-COPY /. ./
+COPY --chown=node:node . .
 RUN npm run build
 
 FROM cgr.dev/chainguard/nginx:latest
