@@ -14,7 +14,7 @@
     "@navikt/ds-react": "^7.35.2",
     "@tanstack/react-query": "^5.90.11",
     "react": "^19.2.3",
-    "react-dom": "^19.2.1",
+    "react-dom": "^19.2.3",
     "react-error-boundary": "^6.0.0"
   },
   "devDependencies": {
