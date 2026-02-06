@@ -15,18 +15,14 @@ import RettsgebyrTabell from './satstabeller/RettsgebyrTabell';
 import BarnetilleggTak2016Tabell from './satstabeller/BarnetilleggTak2016Tabell';
 import NordiskKonvensjonslandTabell from './satstabeller/NordiskKonvensjonslandTabell';
 import EØSKonvensjonslandTabell from './satstabeller/EØSKonvensjonslandTabell';
-import {ErrorBoundary} from 'react-error-boundary';
+import {ErrorBoundary, FallbackProps} from 'react-error-boundary';
 import {environments} from '../constants/Constants';
 import AktivTabellKontroller from './AktivTabellKontroller';
 
-interface ErrorFallbackProps {
-    error: Error;
-}
-
-const ErrorFallback: FC<ErrorFallbackProps> = ({error}) => {
+const ErrorFallback: FC<FallbackProps> = ({error}) => {
     return (
         <Alert variant='error'>
-            {`En feil har oppstått: ${error.message}`}
+            {`En feil har oppstått: ${error instanceof Error ? error.message : String(error)}`}
         </Alert>
     )
 }
