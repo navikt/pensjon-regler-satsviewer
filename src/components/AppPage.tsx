@@ -44,11 +44,7 @@ const AppPage: FC = () => {
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
             <Page>
-                <Box as="header" background="neutral-strong">
-                    <Page.Block width="2xl">
-                        <Header onChangedEnvironment={onChangedEnvironment}/>
-                    </Page.Block>
-                </Box>
+                <Header onChangedEnvironment={onChangedEnvironment}/>
                 <Box
                     padding="space-32"
                     paddingBlock="space-64"
