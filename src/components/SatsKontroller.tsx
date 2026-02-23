@@ -34,7 +34,7 @@ const SatsKontroller: FC<SatsKontrollerProps> = ({ environment, onSatsChange }) 
     }
 
     return (
-        <HGrid gap="10" columns={3}>
+        <HGrid gap="space-40" columns={3}>
 
             <Box>
                 <Select label="PROD satser" onChange={(event: ChangeEvent<HTMLSelectElement>) => {
