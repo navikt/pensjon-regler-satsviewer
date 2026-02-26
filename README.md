@@ -36,9 +36,9 @@ Workflow-filene ligger under `<repo-root>/.github/workflows`
 ## Intern Informasjonsflyt
 
 I det applikasjonen åpnes gjøres et kall til (default q2)
->https://pensjon-regler-q2.dev.adeo.no/alleSatstabeller 
+>https://pensjon-regler-q2.intern.dev.nav.no/alleSatstabeller 
 og
->https://pensjon-regler-q2.dev.adeo.no/aktivTabell
+>https://pensjon-regler-q2.intern.dev.nav.no/aktivTabell
 
 for å hente en liste over alle tilgjengelige satstabeller, samt aktiv satstabell for valgt miljø.
 

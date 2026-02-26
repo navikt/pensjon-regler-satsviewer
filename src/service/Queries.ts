@@ -7,7 +7,7 @@ interface FetchResponse {
 }
 
 const fetchSatsByTabellByMiljøAndTypeAndAktivAndSatstabell = async (environment: string, type: string, aktiv: boolean, satstabell: string): Promise<SatserType> => {
-    const response: FetchResponse = await fetch(`https://pensjon-regler-${environment}.dev.adeo.no/api/${type}?Aktiv=${aktiv}&Satstabell=${satstabell}`,
+    const response: FetchResponse = await fetch(`https://pensjon-regler-${environment}.intern.dev.nav.no/api/${type}?Aktiv=${aktiv}&Satstabell=${satstabell}`,
         {
             headers: {
                 'Content-Type': 'application/json',
@@ -20,7 +20,7 @@ const fetchSatsByTabellByMiljøAndTypeAndAktivAndSatstabell = async (environment
 }
 
 export const fetchAktivSatsTabellByMiljø = async (environment: string): Promise<string> => {
-    const response: FetchResponse = await fetch(`https://pensjon-regler-${environment}.dev.adeo.no/aktivTabell`,
+    const response: FetchResponse = await fetch(`https://pensjon-regler-${environment}.intern.dev.nav.no/aktivTabell`,
         {
             headers: {
                 'Content-Type': 'application/text',
@@ -31,7 +31,7 @@ export const fetchAktivSatsTabellByMiljø = async (environment: string): Promise
 };
 
 export const fetchAlleSatstabellerByMiljø = async (environment: string): Promise<Satser> => {
-    const response: FetchResponse = await fetch(`https://pensjon-regler-${environment}.dev.adeo.no/alleSatstabeller`,
+    const response: FetchResponse = await fetch(`https://pensjon-regler-${environment}.intern.dev.nav.no/alleSatstabeller`,
         {
             headers: {
                 'Content-Type': 'application/json',
