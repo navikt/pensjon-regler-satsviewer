@@ -2,10 +2,16 @@ name: Build and deploy dev gcp
 on:
   push:
     branches:
-      - main
+      - sandbox
+  workflow_run:
+    workflows: ['Merge Main to Sandbox']
+    types:
+      - completed
+  workflow_dispatch:
 jobs:
   build_and_deploy:
     name: Build, push and deploy
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/sandbox') || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
     permissions:
       actions: read
