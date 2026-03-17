@@ -1,22 +1,24 @@
 # pensjon-regler-satsviewer
 ## Beskrivelse
 
-Dette er et Vite React prosjekt, for å starte lokalt kreves node.js.
+Dette er et Vite React prosjekt, for å starte lokalt kreves node.js og pnpm.
 
-Kan installeres på Mac med Homebrev `brew install node` (for andre muligheter https://nodejs.org/en/download/package-manager/#macos, evt. https://nodejs.org/en/download/current/)
+Node kan installeres på Mac med Homebrew `brew install node` (for andre muligheter https://nodejs.org/en/download/package-manager/#macos, evt. https://nodejs.org/en/download/current/)
+
+pnpm kan installeres med `npm install -g pnpm` eller via https://pnpm.io/installation
 
 ## Kjøre lokalt
 
 For å kjøre appen lokalt må man først installere pakker med kommandoen
 
-`npm i`
+`pnpm install`
 
 i Node kommando-vindu etter å ha navigert til
 <repo-location>/pensjon-regler-satsviewer
 
 Deretter kan man starte appen lokalt med kommandoen:
 
-`npm run dev`
+`pnpm dev`
 
 Appen vil da åpnes i standard nettleseren på adressen *http://localhost:5137/*  
 med mindre denne porten er opptatt (Node vil da finne en annen ledig port)
