@@ -1,6 +1,6 @@
 FROM cgr.dev/chainguard/node:latest-dev AS build
 WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN npm install -g pnpm@10.11.0
 COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig*.json vite.config.ts ./
 RUN pnpm install --frozen-lockfile
 COPY --chown=node:node . .
