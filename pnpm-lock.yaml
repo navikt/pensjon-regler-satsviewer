@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@navikt/ds-css':
-        specifier: ^8.6.0
+        specifier: ^8.7.0
         version: 8.7.0
       '@navikt/ds-react':
         specifier: ^8.6.0
@@ -58,7 +58,7 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.56.1
+        specifier: ^8.57.0
         version: 8.57.1(eslint@9.39.4)(typescript@5.9.3)
       vite:
         specifier: ^7.3.1
