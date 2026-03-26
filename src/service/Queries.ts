@@ -4,7 +4,7 @@ import { PROD_ENVIRONMENT } from "../utils/environment";
 
 const getBaseUrl = (environment: string): string => {
     if (environment === PROD_ENVIRONMENT) {
-        return 'https://pensjon-regler.intern.nav.no';
+        return '';
     }
     return `https://pensjon-regler-${environment}.intern.dev.nav.no`;
 };
