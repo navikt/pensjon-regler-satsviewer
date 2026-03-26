@@ -31,6 +31,6 @@ spec:
   accessPolicy:
     outbound:
       rules:
-        - application: pensjon-regler-q2
+        - application: pensjon-regler
   ingresses:
     - "https://pensjon-regler-satsviewer.intern.nav.no"
