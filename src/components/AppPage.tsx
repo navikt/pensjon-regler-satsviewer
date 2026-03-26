@@ -17,6 +17,7 @@ import NordiskKonvensjonslandTabell from './satstabeller/NordiskKonvensjonslandT
 import EØSKonvensjonslandTabell from './satstabeller/EØSKonvensjonslandTabell';
 import {ErrorBoundary, FallbackProps} from 'react-error-boundary';
 import {environments} from '../constants/Constants';
+import {isProduction, PROD_ENVIRONMENT} from '../utils/environment';
 import AktivTabellKontroller from './AktivTabellKontroller';
 
 const ErrorFallback: FC<FallbackProps> = ({error}) => {
@@ -29,8 +30,9 @@ const ErrorFallback: FC<FallbackProps> = ({error}) => {
 
 const AppPage: FC = () => {
 
+    const isProd = isProduction();
     const [sats, setSats] = useState<string | undefined>();
-    const [environment, setEnvironment] = useState<string>(environments[2]);
+    const [environment, setEnvironment] = useState<string>(isProd ? PROD_ENVIRONMENT : environments[2]);
 
     const onChangedEnvironment = (event: React.MouseEvent<Element, MouseEvent>) => {
         // @ts-ignore
@@ -44,7 +46,7 @@ const AppPage: FC = () => {
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
             <Page>
-                <Header onChangedEnvironment={onChangedEnvironment}/>
+                <Header onChangedEnvironment={onChangedEnvironment} isProduction={isProd}/>
                 <Box
                     padding="space-32"
                     paddingBlock="space-64"
