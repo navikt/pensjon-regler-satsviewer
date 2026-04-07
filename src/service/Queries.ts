@@ -14,8 +14,8 @@ interface FetchResponse {
     text: () => Promise<string>;
 }
 
-const fetchSatsByTabellByMiljøAndTypeAndAktivAndSatstabell = async (environment: string, type: string, aktiv: boolean, satstabell: string): Promise<SatserType> => {
-    const response: FetchResponse = await fetch(`${getBaseUrl(environment)}/api/${type}?Aktiv=${aktiv}&Satstabell=${satstabell}`,
+const fetchSatsByTabellByMiljøAndType = async (environment: string, type: string, satstabell: string): Promise<SatserType> => {
+    const response: FetchResponse = await fetch(`${getBaseUrl(environment)}/api/${type}?Satstabell=${satstabell}`,
         {
             headers: {
                 'Content-Type': 'application/json',
@@ -53,8 +53,8 @@ export const fetchAlleSatstabellerByMiljø = async (environment: string): Promis
 
 }
 
-export const querySatsTabellByMiljøAndTypeAndAktiv = (environment: string, type: string, aktiv: boolean, satsTabell: string): UseQueryResult<SatserType, unknown> => useQuery({
-    queryKey: ['satsTabell', environment, type, aktiv, satsTabell],
-    queryFn: () => fetchSatsByTabellByMiljøAndTypeAndAktivAndSatstabell(environment, type, aktiv, satsTabell),
+export const querySatsTabellByMiljøAndType = (environment: string, type: string, satsTabell: string): UseQueryResult<SatserType, unknown> => useQuery({
+    queryKey: ['satsTabell', environment, type, satsTabell],
+    queryFn: () => fetchSatsByTabellByMiljøAndType(environment, type, satsTabell),
     throwOnError: true,
 });

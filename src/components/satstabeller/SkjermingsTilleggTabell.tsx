@@ -1,7 +1,7 @@
 import {FC, useEffect} from "react";
 import {Accordion, Loader, Table} from "@navikt/ds-react";
 import {skjermingstilleggSats} from "../../constants/Constants";
-import {querySatsTabellByMiljøAndTypeAndAktiv} from "../../service/Queries";
+import {querySatsTabellByMiljøAndType} from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
 import {useQueryClient, UseQueryResult} from '@tanstack/react-query';
 import {Sats, SkjermingstilleggSats} from "../../model";
@@ -26,7 +26,7 @@ const SkjermingsTilleggTabell: FC<SkjermingsTilleggTabellProps> = ({environment,
         isLoading,
         isSuccess,
         isFetching
-    } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell) as UseQueryResult<SkjermingstilleggSats>;
+    } = querySatsTabellByMiljøAndType(environment, type, satstabell) as UseQueryResult<SkjermingstilleggSats>;
 
     if (isError) {
         throw new Error(`Det oppstod en feil ved henting av satsTabell mot miljø ${environment}.`);
