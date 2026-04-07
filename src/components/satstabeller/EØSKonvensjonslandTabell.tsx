@@ -1,7 +1,7 @@
 import { useEffect, FC } from "react";
 import { Accordion, Loader, Table } from "@navikt/ds-react";
 import { eøsKonvensjonsLandSats } from "../../constants/Constants";
-import { querySatsTabellByMiljøAndTypeAndAktiv } from "../../service/Queries";
+import { querySatsTabellByMiljøAndType } from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
 import {useQueryClient, UseQueryResult} from '@tanstack/react-query';
 import {EosKonvensjonsLandSatser, LandSats} from "../../model";
@@ -20,7 +20,7 @@ const EØSKonvensjonslandTabell: FC<EØSKonvensjonslandTabellProps> = ({ environ
         queryClient.invalidateQueries({ queryKey: ['satsTabell'] });
     }, [satstabell]);
 
-    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell) as UseQueryResult<EosKonvensjonsLandSatser>;
+    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndType(environment, type, satstabell) as UseQueryResult<EosKonvensjonsLandSatser>;
 
     if (isError) {
         throw new Error(`Det oppstod en feil ved henting av satsTabell mot miljø ${environment}.`);
