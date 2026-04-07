@@ -1,7 +1,7 @@
 import { useEffect, FC } from "react";
 import { Accordion, Loader, Table } from "@navikt/ds-react";
 import { rettsgebyrSats } from "../../constants/Constants";
-import { querySatsTabellByMiljøAndTypeAndAktiv } from "../../service/Queries";
+import { querySatsTabellByMiljøAndType } from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
 import {useQueryClient, UseQueryResult} from '@tanstack/react-query';
 import {RettsgebyrSats, RettsgebyrSatser} from "../../model";
@@ -20,7 +20,7 @@ const RettsgebyrTabell: FC<RettsgebyrTabellProps> = ({ environment, satstabell }
         queryClient.invalidateQueries({ queryKey: ['satsTabell'] });
     }, [satstabell]);
 
-    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell) as UseQueryResult<RettsgebyrSatser>;
+    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndType(environment, type, satstabell) as UseQueryResult<RettsgebyrSatser>;
 
     if (isError) {
         throw new Error(`Det oppstod en feil ved henting av satsTabell mot miljø ${environment}.`);

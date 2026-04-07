@@ -1,7 +1,7 @@
 import {FC, useEffect} from "react";
 import {Accordion, Loader, Table} from "@navikt/ds-react";
 import {veietGrunnbeløpSats} from "../../constants/Constants";
-import {querySatsTabellByMiljøAndTypeAndAktiv} from "../../service/Queries";
+import {querySatsTabellByMiljøAndType} from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
 import {useQueryClient, UseQueryResult} from '@tanstack/react-query';
 import {Sats, VeietGrunnbelopSatser} from "../../model";
@@ -26,7 +26,7 @@ const VeietGrunnbeløpTabell: FC<VeietGrunnbeløpTabellProps> = ({environment, s
         isLoading,
         isSuccess,
         isFetching
-    } = querySatsTabellByMiljøAndTypeAndAktiv(environment, type, false, satstabell) as UseQueryResult<VeietGrunnbelopSatser>;
+    } = querySatsTabellByMiljøAndType(environment, type, satstabell) as UseQueryResult<VeietGrunnbelopSatser>;
 
     if (isError) {
         throw new Error(`Det oppstod en feil ved henting av satsTabell mot miljø ${environment}.`);
