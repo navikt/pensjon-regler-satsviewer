@@ -4,6 +4,7 @@ name: Slack-varsel for BAU pull-requests
 on:
   pull_request:
     types: [opened, reopened, ready_for_review]
+    branches: [main]
 
 jobs:
   slack-varsel:
@@ -13,13 +14,12 @@ jobs:
     name: Send Slack-varsel om BAU PR
     runs-on: ubuntu-latest
     steps:
+      - name: Sjekk ut kode
+        uses: actions/checkout@v6
       - name: Send melding til Slack
         run: |
-          curl -X POST \
-            -H 'Content-type: application/json' \
-            --data '{
-              "text": "<!here> :eyes: En BAU pull-request trenger godkjenning!\n*<${{ github.event.pull_request.html_url }}|${{ github.event.pull_request.title }}>*\nOpprettet av: ${{ github.event.pull_request.user.login }}"
-            }' \
-            "$WEBHOOK_URL"
+          PAYLOAD="payload={ \"text\": \"<!here> :eyes: \nEn BAU pull-request trenger godkjenning!\n*<${{ github.event.pull_request.html_url }}|${{ github.event.pull_request.title }}>*\nOpprettet av: \${slack_id}\" }"
+          "${GITHUB_WORKSPACE}/.github/slack.sh" "${AUTHOR}" "${PAYLOAD}" "${WEBHOOK_URL}"
         env:
+          AUTHOR: ${{ github.event.pull_request.user.login }}
           WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
