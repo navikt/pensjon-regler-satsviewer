@@ -1,0 +1,25 @@
+## Varsler Slack-kanal om BAU pull-requests som trenger godkjenning
+name: Slack-varsel for BAU pull-requests
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+
+jobs:
+  slack-varsel:
+    if: |
+      github.event.pull_request.draft == false &&
+      startsWith(github.head_ref, 'bau/')
+    name: Send Slack-varsel om BAU PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send melding til Slack
+        run: |
+          curl -X POST \
+            -H 'Content-type: application/json' \
+            --data '{
+              "text": "<!here> :eyes: En BAU pull-request trenger godkjenning!\n*<${{ github.event.pull_request.html_url }}|${{ github.event.pull_request.title }}>*\nOpprettet av: ${{ github.event.pull_request.user.login }}"
+            }' \
+            "$WEBHOOK_URL"
+        env:
+          WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
