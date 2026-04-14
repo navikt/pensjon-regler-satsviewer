@@ -6,8 +6,10 @@ ENV PATH="/app/.pnpm:$PATH"
 RUN mkdir -p /app/.pnpm /app/.corepack && \
     corepack enable --install-directory /app/.pnpm && \
     corepack prepare pnpm@latest --activate
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig*.json vite.config.ts ./
-RUN pnpm install --frozen-lockfile
+ARG NODE_AUTH_TOKEN
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig*.json vite.config.ts .npmrc ./
+RUN echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc && \
+    pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm run build
 
