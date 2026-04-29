@@ -13,3 +13,4 @@ export const rettsgebyrSats = 'rettsgebyrSats';
 export const barnetilleggTak2016Sats = 'barnetilleggTak2016Sats';
 export const nordiskKonvensjonsLandSats = 'nordiskKonvensjonsLandSats';
 export const eøsKonvensjonsLandSats = 'eøsKonvensjonsLandSats';
+export const referansebeløpAfpSats = 'referansebeløpAfp';
