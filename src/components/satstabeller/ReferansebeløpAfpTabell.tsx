@@ -50,9 +50,8 @@ const ReferansebeløpAfpTabell: FC<ReferansebeløpAfpTabellProps> = ({ environme
                             <Table.Header>
                                 <Table.Row>
                                     <Table.HeaderCell scope="col">FomDato</Table.HeaderCell>
-                                    <Table.HeaderCell scope="col">TomDato</Table.HeaderCell>
                                     {kulls.map(kull => (
-                                        <Table.HeaderCell key={kull} scope="col">Kull {kull}</Table.HeaderCell>
+                                        <Table.HeaderCell key={kull} scope="col">{kull}</Table.HeaderCell>
                                     ))}
                                 </Table.Row>
                             </Table.Header>
@@ -60,7 +59,6 @@ const ReferansebeløpAfpTabell: FC<ReferansebeløpAfpTabellProps> = ({ environme
                                 {data.satser.map((rad: ReferansebeløpAfpSats, key: number) => (
                                     <Table.Row key={key}>
                                         <Table.DataCell>{rad.satsFom[0] < 0 ? 'N/A' : `${rad.satsFom[2]}-${rad.satsFom[1]}-${rad.satsFom[0]}`}</Table.DataCell>
-                                        <Table.DataCell>{rad.satsTom[0] > 10000 ? 'N/A' : `${rad.satsTom[2]}-${rad.satsTom[1]}-${rad.satsTom[0]}`}</Table.DataCell>
                                         {kulls.map(kull => (
                                             <Table.DataCell key={kull}>{rad.kodeMap[kull]}</Table.DataCell>
                                         ))}
