@@ -1,16 +1,10 @@
-import { FC, useMemo, useState } from 'react';
-import { Alert, Box, Heading, Loader, Page, Select, Table, Tag } from "@navikt/ds-react";
-import { SatsHistoryEntry, useSatsHistory } from '../service/SatsHistoryService';
+import { FC, useState } from 'react';
+import { Alert, Box, Heading, Loader, Page, Select, Table } from "@navikt/ds-react";
+import { useSatsHistory } from '../service/SatsHistoryService';
 import Header from './Header';
 import { isProduction } from '../utils/environment';
 
-const environmentColors: Record<string, "info" | "success" | "warning" | "error" | "neutral"> = {
-    prod: 'error',
-    q0: 'warning',
-    q1: 'info',
-    q2: 'success',
-    q5: 'neutral',
-};
+const ENVIRONMENTS = ['q1', 'q2', 'q5', 'prod'];
 
 const formatDate = (iso: string): string => {
     const date = new Date(iso);
@@ -24,32 +18,9 @@ const formatDate = (iso: string): string => {
 };
 
 const HistoryPage: FC = () => {
-    const { data, isLoading, error } = useSatsHistory();
-    const [envFilter, setEnvFilter] = useState<string>('alle');
+    const [selectedEnv, setSelectedEnv] = useState<string | null>(null);
+    const { data, isLoading, error } = useSatsHistory(selectedEnv);
     const isProd = isProduction();
-
-    const filteredData = useMemo(() => {
-        if (!data) return [];
-        if (envFilter === 'alle') return data;
-        return data.filter(entry => entry.environment === envFilter);
-    }, [data, envFilter]);
-
-    const uniqueEnvironments = useMemo(() => {
-        if (!data) return [];
-        return [...new Set(data.map(e => e.environment))].sort();
-    }, [data]);
-
-    // Første entry per miljø (sortert nyest først) = nåværende aktiv satstabell
-    const currentSatsPerEnv = useMemo(() => {
-        if (!data) return new Map<string, SatsHistoryEntry>();
-        const map = new Map<string, SatsHistoryEntry>();
-        for (const entry of data) {
-            if (!map.has(entry.environment)) {
-                map.set(entry.environment, entry);
-            }
-        }
-        return map;
-    }, [data]);
 
     return (
         <Page>
@@ -58,33 +29,26 @@ const HistoryPage: FC = () => {
                 <Page.Block gutters width="2xl">
                     <Heading size="large" spacing>Satshistorikk</Heading>
 
-                    {currentSatsPerEnv.size > 0 && (
-                        <Box padding="space-16" paddingBlock="space-16" borderRadius="8" background="sunken">
-                            <Heading size="small" spacing>Nåværende satstabell per miljø</Heading>
-                            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                                {[...currentSatsPerEnv.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([env, entry]) => (
-                                    <Tag key={env} variant={environmentColors[env] || 'neutral'} size="medium">
-                                        {env.toUpperCase()}: {entry.satstabell}
-                                    </Tag>
-                                ))}
-                            </div>
-                        </Box>
-                    )}
-
                     <Box paddingBlock="space-16">
                         <Select
-                            label="Filtrer på miljø"
+                            label="Velg miljø"
                             size="small"
-                            value={envFilter}
-                            onChange={e => setEnvFilter(e.target.value)}
+                            value={selectedEnv || ''}
+                            onChange={e => setSelectedEnv(e.target.value || null)}
                             style={{ maxWidth: '200px' }}
                         >
-                            <option value="alle">Alle miljøer</option>
-                            {uniqueEnvironments.map(env => (
+                            <option value="">— Velg miljø —</option>
+                            {ENVIRONMENTS.map(env => (
                                 <option key={env} value={env}>{env.toUpperCase()}</option>
                             ))}
                         </Select>
                     </Box>
+
+                    {!selectedEnv && (
+                        <Alert variant="info">
+                            Velg et miljø for å se satshistorikk.
+                        </Alert>
+                    )}
 
                     {isLoading && (
                         <Box padding="space-32" style={{ display: 'flex', justifyContent: 'center' }}>
@@ -98,26 +62,20 @@ const HistoryPage: FC = () => {
                         </Alert>
                     )}
 
-                    {filteredData.length > 0 && (
+                    {data && data.length > 0 && (
                         <Table size="small">
                             <Table.Header>
                                 <Table.Row>
                                     <Table.HeaderCell>Tidspunkt</Table.HeaderCell>
-                                    <Table.HeaderCell>Miljø</Table.HeaderCell>
                                     <Table.HeaderCell>Satstabell</Table.HeaderCell>
                                     <Table.HeaderCell>Versjon</Table.HeaderCell>
                                     <Table.HeaderCell>Utført av</Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {filteredData.map((entry, i) => (
-                                    <Table.Row key={`${entry.environment}-${entry.timestamp}-${i}`}>
+                                {data.map((entry, i) => (
+                                    <Table.Row key={`${entry.timestamp}-${i}`}>
                                         <Table.DataCell>{formatDate(entry.timestamp)}</Table.DataCell>
-                                        <Table.DataCell>
-                                            <Tag variant={environmentColors[entry.environment] || 'neutral'} size="small">
-                                                {entry.environment.toUpperCase()}
-                                            </Tag>
-                                        </Table.DataCell>
                                         <Table.DataCell>
                                             <strong>{entry.satstabell}</strong>
                                         </Table.DataCell>
@@ -141,9 +99,9 @@ const HistoryPage: FC = () => {
                         </Table>
                     )}
 
-                    {!isLoading && !error && filteredData.length === 0 && (
+                    {selectedEnv && !isLoading && !error && data && data.length === 0 && (
                         <Alert variant="info">
-                            Ingen satshistorikk funnet. GitHub Actions-logger er kun tilgjengelig i 90 dager.
+                            Ingen satshistorikk funnet for {selectedEnv.toUpperCase()}. GitHub Actions-logger er kun tilgjengelig i 90 dager.
                         </Alert>
                     )}
                 </Page.Block>
