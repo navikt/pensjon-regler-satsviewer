@@ -31,9 +31,7 @@ get_installation_token() {
     -H "Accept: application/vnd.github.v3+json" \
     https://api.github.com/app/installations)
 
-  echo "Installations response: $RESPONSE" >&2
-
-  INSTALLATION_ID=$(echo "$RESPONSE" | sed -n 's/.*"id":\([0-9]*\).*/\1/p' | head -1)
+  INSTALLATION_ID=$(echo "$RESPONSE" | sed -n 's/.*"id": *\([0-9]*\).*/\1/p' | head -1)
 
   if [ -z "$INSTALLATION_ID" ]; then
     echo "ERROR: Could not get installation ID" >&2
@@ -42,7 +40,7 @@ get_installation_token() {
 
   TOKEN=$(curl -sf -X POST -H "Authorization: Bearer $JWT" \
     -H "Accept: application/vnd.github.v3+json" \
-    "https://api.github.com/app/installations/$INSTALLATION_ID/access_tokens" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+    "https://api.github.com/app/installations/$INSTALLATION_ID/access_tokens" | sed -n 's/.*"token": *"\([^"]*\)".*/\1/p')
 
   if [ -z "$TOKEN" ]; then
     echo "ERROR: Could not get installation token" >&2
