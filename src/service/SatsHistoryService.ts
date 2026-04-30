@@ -4,10 +4,10 @@ import { useQuery, UseQueryResult } from "@tanstack/react-query";
  * Henter satshistorikk ved å parse GitHub Actions deploy-logger.
  *
  * - Q1/Q2/Q5: Parses fra Slack-notifikasjonssteget i deploy-jobb-logger (inneholder "satstabell: X")
- * - Prod/Q0: Parses fra git-historikk til SatsServiceInitializer.kt (PROD_SATSTABELL-konstanten)
  *
- * Krever GitHub App "pensjon-regler-tokens" med actions:read og contents:read.
+ * Krever GitHub App "pensjon-regler-tokens" med actions:read.
  * Logger er kun tilgjengelig i 90 dager.
+ * Kun tilgjengelig i dev-miljø.
  */
 
 export interface SatsHistoryEntry {
@@ -48,18 +48,15 @@ const GITHUB_API_PROXY = '/github-api';
 
 const WORKFLOW_IDS = {
     sandbox: 200229765,
-    prod: 27819037,
     deployQ1: 14297582,
     deployQ2: 5007102,
     deployQ5: 13932626,
 };
 
 const ENV_JOB_PATTERNS: Record<string, string[]> = {
-    q0: ['Deploy Q0 FSS', 'Deploy Q0 GCP'],
     q1: ['Deploy Q1 FSS', 'Deploy Q1 GCP'],
     q2: ['Deploy Q2 FSS', 'Deploy Q2 GCP'],
     q5: ['Deploy Q5 FSS', 'Deploy Q5 GCP'],
-    prod: ['Deploy prod FSS', 'Deploy prod GCP'],
 };
 
 async function fetchFromGitHub(path: string): Promise<Response> {
@@ -109,57 +106,6 @@ function parseVersion(logContent: string): string | null {
     return match ? match[1] : null;
 }
 
-async function fetchProdHistory(): Promise<SatsHistoryEntry[]> {
-    // Prod/Q0 satstabell er hardkodet i SatsServiceInitializer.kt (PROD_SATSTABELL).
-    // Sporer endringer via git-historikken til filen.
-    const response = await fetchFromGitHub(
-        '/repos/navikt/pensjon-regler/commits?path=repository/nav-sats-pensjon/src/main/kotlin/no/nav/sats/pensjon/config/SatsServiceInitializer.kt&per_page=30'
-    );
-    if (!response.ok) throw new Error(`GitHub API error: ${response.status}`);
-
-    const commits: Array<{
-        sha: string;
-        commit: { message: string; author: { name: string; date: string } };
-        author: { login: string } | null;
-    }> = await response.json();
-
-    // Hent filinnhold for alle commits parallelt
-    const results = await Promise.all(
-        commits.map(async (commit) => {
-            try {
-                const fileResponse = await fetchFromGitHub(
-                    `/repos/navikt/pensjon-regler/contents/repository/nav-sats-pensjon/src/main/kotlin/no/nav/sats/pensjon/config/SatsServiceInitializer.kt?ref=${commit.sha}`
-                );
-                if (!fileResponse.ok) return null;
-
-                const fileData: { content: string } = await fileResponse.json();
-                const content = atob(fileData.content.replace(/\n/g, ''));
-
-                const match = content.match(/PROD_SATSTABELL\s*=\s*"([^"]+)"/);
-                if (!match) return null;
-
-                return {
-                    environment: 'prod',
-                    satstabell: match[1],
-                    version: commit.sha.substring(0, 12),
-                    timestamp: commit.commit.author.date,
-                    actor: commit.author?.login || commit.commit.author.name,
-                    runId: 0,
-                } as SatsHistoryEntry;
-            } catch {
-                return null;
-            }
-        })
-    );
-
-    const entries = results.filter((x): x is SatsHistoryEntry => x !== null);
-
-    // Mange commits endrer filen uten å endre satstabell — behold kun faktiske endringer
-    return entries.filter((entry, i, arr) =>
-        i === 0 || entry.satstabell !== arr[i - 1].satstabell
-    );
-}
-
 async function fetchStandaloneDeployHistory(workflowId: number, env: string): Promise<SatsHistoryEntry[]> {
     const runs = await fetchWorkflowRuns(workflowId, 50);
 
@@ -201,28 +147,21 @@ async function fetchStandaloneDeployHistory(workflowId: number, env: string): Pr
 }
 
 /**
- * Henter historikk for ett spesifikt miljø.
- * For Q-miljøer sjekkes både sandbox-workflowen og den dedikerte deploy-workflowen.
+ * Henter historikk for ett spesifikt Q-miljø.
+ * Sjekker både sandbox-workflowen og den dedikerte deploy-workflowen.
  */
 export async function fetchHistoryForEnvironment(env: string): Promise<SatsHistoryEntry[]> {
-    let entries: SatsHistoryEntry[] = [];
+    const standaloneId = env === 'q1' ? WORKFLOW_IDS.deployQ1
+        : env === 'q2' ? WORKFLOW_IDS.deployQ2
+        : env === 'q5' ? WORKFLOW_IDS.deployQ5
+        : null;
 
-    if (env === 'prod') {
-        entries = await fetchProdHistory();
-    } else {
-        const standaloneId = env === 'q1' ? WORKFLOW_IDS.deployQ1
-            : env === 'q2' ? WORKFLOW_IDS.deployQ2
-            : env === 'q5' ? WORKFLOW_IDS.deployQ5
-            : null;
+    const [sandboxEntries, standaloneEntries] = await Promise.all([
+        fetchSandboxHistoryForEnv(env).catch(() => []),
+        standaloneId ? fetchStandaloneDeployHistory(standaloneId, env).catch(() => []) : Promise.resolve([]),
+    ]);
 
-        const [sandboxEntries, standaloneEntries] = await Promise.all([
-            fetchSandboxHistoryForEnv(env).catch(() => []),
-            standaloneId ? fetchStandaloneDeployHistory(standaloneId, env).catch(() => []) : Promise.resolve([]),
-        ]);
-
-        entries = [...sandboxEntries, ...standaloneEntries];
-    }
-
+    const entries = [...sandboxEntries, ...standaloneEntries];
     entries.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
     // Dedupliser: sandbox og standalone kan logge samme deploy — fjern duplikater innen 1 time

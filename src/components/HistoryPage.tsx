@@ -4,7 +4,7 @@ import { useSatsHistory } from '../service/SatsHistoryService';
 import Header from './Header';
 import { isProduction } from '../utils/environment';
 
-const ENVIRONMENTS = ['q1', 'q2', 'q5', 'prod'];
+const ENVIRONMENTS = ['q1', 'q2', 'q5'];
 
 const formatDate = (iso: string): string => {
     const date = new Date(iso);
