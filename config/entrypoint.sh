@@ -27,9 +27,13 @@ generate_jwt() {
 get_installation_token() {
   JWT=$(generate_jwt)
 
-  INSTALLATION_ID=$(curl -sf -H "Authorization: Bearer $JWT" \
+  RESPONSE=$(curl -s -H "Authorization: Bearer $JWT" \
     -H "Accept: application/vnd.github.v3+json" \
-    https://api.github.com/app/installations | sed -n 's/.*"id":\([0-9]*\).*/\1/p' | head -1)
+    https://api.github.com/app/installations)
+
+  echo "Installations response: $RESPONSE" >&2
+
+  INSTALLATION_ID=$(echo "$RESPONSE" | sed -n 's/.*"id":\([0-9]*\).*/\1/p' | head -1)
 
   if [ -z "$INSTALLATION_ID" ]; then
     echo "ERROR: Could not get installation ID" >&2
