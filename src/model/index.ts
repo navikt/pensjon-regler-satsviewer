@@ -125,6 +125,14 @@ export interface EosKonvensjonsLandSatser {
     satser: LandSats[];
 }
 
+export interface ReferansebeløpAfpSats extends BaseSats {
+    kodeMap: Record<string, number>;
+}
+
+export interface ReferansebeløpAfpSatser {
+    satser: ReferansebeløpAfpSats[];
+}
+
 export type SatserType =
     | GrunnbelopSatser
     | VeietGrunnbelopSatser
@@ -139,7 +147,8 @@ export type SatserType =
     | RettsgebyrSatser
     | BarnetilleggTak2016Satser
     | NordiskKonvensjonsLandSatser
-    | EosKonvensjonsLandSatser;
+    | EosKonvensjonsLandSatser
+    | ReferansebeløpAfpSatser;
 
 export interface Satser {
     satser: string[];
