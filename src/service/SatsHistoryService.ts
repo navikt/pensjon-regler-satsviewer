@@ -1,5 +1,15 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 
+/**
+ * Henter satshistorikk ved å parse GitHub Actions deploy-logger.
+ *
+ * - Q1/Q2/Q5: Parses fra Slack-notifikasjonssteget i deploy-jobb-logger (inneholder "satstabell: X")
+ * - Prod/Q0: Parses fra git-historikk til SatsServiceInitializer.kt (PROD_SATSTABELL-konstanten)
+ *
+ * Krever GitHub App "pensjon-regler-tokens" med actions:read og contents:read.
+ * Logger er kun tilgjengelig i 90 dager.
+ */
+
 export interface SatsHistoryEntry {
     environment: string;
     satstabell: string;
@@ -58,17 +68,20 @@ async function fetchFromGitHub(path: string): Promise<Response> {
 }
 
 async function fetchWorkflowRuns(workflowId: number, perPage = 30): Promise<WorkflowRun[]> {
+    // GitHub beholder jobb-logger i kun 90 dager — unngår å hente eldre runs
+    const since = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     const response = await fetchFromGitHub(
-        `/repos/navikt/pensjon-regler/actions/workflows/${workflowId}/runs?status=completed&conclusion=success&per_page=${perPage}`
+        `/repos/navikt/pensjon-regler/actions/workflows/${workflowId}/runs?status=completed&conclusion=success&per_page=${perPage}&created=>${since}`
     );
     if (!response.ok) throw new Error(`GitHub API error: ${response.status}`);
     const data: WorkflowRunsResponse = await response.json();
     return data.workflow_runs;
 }
 
-async function fetchJobLogs(jobId: number): Promise<string> {
+async function fetchJobLogs(jobId: number): Promise<string | null> {
     const response = await fetchFromGitHub(`/repos/navikt/pensjon-regler/actions/jobs/${jobId}/logs`);
-    if (!response.ok) throw new Error(`GitHub API error fetching logs: ${response.status}`);
+    if (response.status === 410) return null; // 410 Gone = logger utløpt (eldre enn 90 dager)
+    if (!response.ok) return null;
     return response.text();
 }
 
@@ -80,7 +93,7 @@ async function fetchJobsForRun(runId: number): Promise<WorkflowJob[]> {
 }
 
 function parseSatstabell(logContent: string): string | null {
-    // Match patterns like: (satstabell: SAT2025) or satstabell_type=SAT2025
+    // Slack-steget printer: "Deploy av X (satstabell: SAT2025) til env er ferdig."
     const match = logContent.match(/satstabell:\s*([A-Za-z0-9_-]+)/);
     if (match) return match[1];
 
@@ -96,6 +109,7 @@ function parseVersion(logContent: string): string | null {
 }
 
 async function fetchSandboxHistory(): Promise<SatsHistoryEntry[]> {
+    // Sandbox-workflowen deployer alle Q-miljøer (q1/q2/q5) i én kjøring
     const runs = await fetchWorkflowRuns(WORKFLOW_IDS.sandbox);
     const entries: SatsHistoryEntry[] = [];
 
@@ -103,6 +117,7 @@ async function fetchSandboxHistory(): Promise<SatsHistoryEntry[]> {
         const jobs = await fetchJobsForRun(run.id);
 
         for (const [env, patterns] of Object.entries(ENV_JOB_PATTERNS)) {
+            // Prod/Q0 bruker git-historikk i stedet (hardkodet konstant)
             if (env === 'prod' || env === 'q0') continue;
 
             const envJob = jobs.find(j =>
@@ -112,6 +127,7 @@ async function fetchSandboxHistory(): Promise<SatsHistoryEntry[]> {
             if (envJob) {
                 try {
                     const logs = await fetchJobLogs(envJob.id);
+                    if (!logs) continue;
                     const satstabell = parseSatstabell(logs);
                     const version = parseVersion(logs);
 
@@ -126,7 +142,7 @@ async function fetchSandboxHistory(): Promise<SatsHistoryEntry[]> {
                         });
                     }
                 } catch {
-                    // Skip if logs are unavailable (expired)
+                    // Hopp over hvis logger er utilgjengelige
                 }
             }
         }
@@ -136,7 +152,8 @@ async function fetchSandboxHistory(): Promise<SatsHistoryEntry[]> {
 }
 
 async function fetchProdHistory(): Promise<SatsHistoryEntry[]> {
-    // For prod/q0, we look at commits to SatsServiceInitializer.kt
+    // Prod/Q0 satstabell er hardkodet i SatsServiceInitializer.kt (PROD_SATSTABELL).
+    // Sporer endringer via git-historikken til filen.
     const response = await fetchFromGitHub(
         '/repos/navikt/pensjon-regler/commits?path=repository/nav-sats-pensjon/src/main/kotlin/no/nav/sats/pensjon/config/SatsServiceInitializer.kt&per_page=30'
     );
@@ -172,11 +189,11 @@ async function fetchProdHistory(): Promise<SatsHistoryEntry[]> {
                 });
             }
         } catch {
-            // Skip if file is unavailable at this commit
+            // Hopp over hvis filen ikke finnes på denne committen
         }
     }
 
-    // Deduplicate consecutive entries with same satstabell
+    // Mange commits endrer filen uten å endre satstabell — behold kun faktiske endringer
     return entries.filter((entry, i, arr) =>
         i === 0 || entry.satstabell !== arr[i - 1].satstabell
     );
@@ -193,6 +210,7 @@ async function fetchStandaloneDeployHistory(workflowId: number, env: string): Pr
         if (successJob) {
             try {
                 const logs = await fetchJobLogs(successJob.id);
+                if (!logs) continue;
                 const satstabell = parseSatstabell(logs);
                 const version = parseVersion(logs);
 
@@ -226,10 +244,9 @@ export async function fetchAllSatsHistory(): Promise<SatsHistoryEntry[]> {
 
     const all = [...sandbox, ...prod, ...q1, ...q2, ...q5];
 
-    // Sort by timestamp descending
     all.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-    // Deduplicate: same env + same satstabell + same timestamp (within 1 hour)
+    // Dedupliser: sandbox og standalone kan logge samme deploy — fjern duplikater innen 1 time
     return all.filter((entry, i, arr) => {
         if (i === 0) return true;
         const prev = arr[i - 1];
