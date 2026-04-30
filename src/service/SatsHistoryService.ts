@@ -36,6 +36,7 @@ interface WorkflowJob {
     id: number;
     name: string;
     conclusion: string;
+    completed_at: string | null;
     steps: { name: string; conclusion: string }[];
 }
 
@@ -136,7 +137,8 @@ async function fetchSandboxHistory(): Promise<SatsHistoryEntry[]> {
                             environment: env,
                             satstabell,
                             version: version || 'unknown',
-                            timestamp: run.created_at,
+                            // Bruker jobb-ferdigtidspunkt, ikke workflow-start (som inkluderer byggetid)
+                            timestamp: envJob.completed_at || run.created_at,
                             actor: run.actor.login,
                             runId: run.id,
                         });
@@ -219,7 +221,7 @@ async function fetchStandaloneDeployHistory(workflowId: number, env: string): Pr
                         environment: env,
                         satstabell,
                         version: version || 'unknown',
-                        timestamp: run.created_at,
+                        timestamp: successJob.completed_at || run.created_at,
                         actor: run.actor.login,
                         runId: run.id,
                     });
