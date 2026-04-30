@@ -161,7 +161,7 @@ async function fetchProdHistory(): Promise<SatsHistoryEntry[]> {
 }
 
 async function fetchStandaloneDeployHistory(workflowId: number, env: string): Promise<SatsHistoryEntry[]> {
-    const runs = await fetchWorkflowRuns(workflowId, 15);
+    const runs = await fetchWorkflowRuns(workflowId, 50);
 
     // Hent alle jobber parallelt
     const runsWithJobs = await Promise.all(
@@ -239,7 +239,7 @@ export async function fetchHistoryForEnvironment(env: string): Promise<SatsHisto
 
 /** Henter sandbox-historikk filtrert til ett miljø */
 async function fetchSandboxHistoryForEnv(env: string): Promise<SatsHistoryEntry[]> {
-    const runs = await fetchWorkflowRuns(WORKFLOW_IDS.sandbox, 15);
+    const runs = await fetchWorkflowRuns(WORKFLOW_IDS.sandbox, 50);
     const patterns = ENV_JOB_PATTERNS[env];
     if (!patterns) return [];
 
