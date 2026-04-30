@@ -45,5 +45,5 @@ jobs:
           TZ: Europe/Oslo
           CLUSTER: dev-gcp
           RESOURCE: nais.yml
-          VAR: image=${{ steps.replace-tag.outputs.IMAGE }}
+          VAR: image=${{ steps.replace-tag.outputs.IMAGE }},github_app_id=${{ secrets.APP_ID }},github_app_private_key=${{ secrets.APP_PRIVATE_KEY }}
           TELEMETRY: ${{ steps.docker-build-push.outputs.telemetry }}

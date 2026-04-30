@@ -14,7 +14,9 @@ RUN --mount=type=secret,id=NODE_AUTH_TOKEN \
 COPY . .
 RUN pnpm run build
 
-FROM cgr.dev/chainguard/nginx:latest
+FROM cgr.dev/chainguard/nginx:latest-dev
 COPY --from=build --chown=nonroot:nonroot /app/dist /usr/share/nginx/html
 COPY --chown=nonroot:nonroot ./config/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --chown=nonroot:nonroot ./config/entrypoint.sh /entrypoint.sh
 EXPOSE 8080
+ENTRYPOINT ["/entrypoint.sh"]

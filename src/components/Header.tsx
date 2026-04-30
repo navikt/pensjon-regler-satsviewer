@@ -1,18 +1,31 @@
 import { Dropdown, InternalHeader, Spacer } from "@navikt/ds-react";
 import { environments } from "../constants/Constants";
 import { FC } from 'react';
+import { Link } from "react-router-dom";
 
 interface HeaderProps {
     onChangedEnvironment: (event:  React.MouseEvent<Element, MouseEvent>) => void;
     isProduction: boolean;
+    showHistoryLink?: boolean;
+    showBackLink?: boolean;
 }
 
-const Header: FC<HeaderProps> = ({ onChangedEnvironment, isProduction }) => {
+const Header: FC<HeaderProps> = ({ onChangedEnvironment, isProduction, showHistoryLink = true, showBackLink = false }) => {
 
     return (
         <InternalHeader>
             <InternalHeader.Title as="h1">pensjon-regler-satsviewer</InternalHeader.Title>
             <Spacer />
+            {showHistoryLink && (
+                <Link to="/historikk" style={{ color: 'white', textDecoration: 'none', padding: '0 1rem', display: 'flex', alignItems: 'center' }}>
+                    Satshistorikk
+                </Link>
+            )}
+            {showBackLink && (
+                <Link to="/" style={{ color: 'white', textDecoration: 'none', padding: '0 1rem', display: 'flex', alignItems: 'center' }}>
+                    ← Tilbake
+                </Link>
+            )}
             {!isProduction && (
                 <Dropdown onSelect={(event: React.MouseEvent<Element, MouseEvent>) => onChangedEnvironment(event)}>
                     <InternalHeader.Button as={Dropdown.Toggle}>

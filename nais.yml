@@ -28,8 +28,15 @@ spec:
     requests:
       cpu: "100m"
       memory: "512Mi"
+  env:
+    - name: GITHUB_APP_ID
+      value: "{{ github_app_id }}"
+    - name: GITHUB_APP_PRIVATE_KEY
+      value: "{{ github_app_private_key }}"
   accessPolicy:
     outbound:
+      external:
+        - host: api.github.com
       rules:
         - application: pensjon-regler-q0
         - application: pensjon-regler-q1
