@@ -49,8 +49,22 @@ tabellene i denne kategorien og selve tabell-komponenten populeres.
 
 Applikasjonen har alltid én tabell aktiv, default er tabellen som er aktiv i Q2.  
 Dette kan endres ved å velge et annet miljø i menyen.
+## Satshistorikk
+
+Historikk-siden (`/historikk`) viser hvilke satstabeller som har vært aktive i hvert miljø over tid.
+
+Data hentes fra GitHub Actions via en nginx-proxy (`/github-api/`). Autentisering skjer med 
+GitHub App "pensjon-regler-tokens" — token genereres ved container-oppstart og refreshes hver 50. minutt.
+
+**Krav til GitHub App-permissions:** `actions: read`, `contents: read`
+
+Secrets som trengs i dette repoet:
+- `APP_ID` — GitHub App ID
+- `APP_PRIVATE_KEY` — GitHub App private key (PEM-format, base64-encodes i workflow før deploy)
+
 ## Utvikling
 
 Dersom det lages en ny satstabell må denne eksponeres via et nytt endepunkt i  
 komponenten `HentSatsController` fra pensjon-regler. 
 Deretter må det lages en ny tabell i Satsviewer på samme måte som andre tabeller er blitt laget i `src/components/satstabeller/`.
+

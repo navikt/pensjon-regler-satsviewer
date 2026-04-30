@@ -45,11 +45,14 @@ jobs:
           original_image="${{ steps.docker-build-push.outputs.image }}"
           new_image="${original_image%:*}:${{ steps.tag.outputs.TAG }}"
           echo "IMAGE=${new_image}" >> $GITHUB_OUTPUT
+      - name: Encode GitHub App private key
+        id: encode-key
+        run: echo "ENCODED_KEY=$(echo '${{ secrets.APP_PRIVATE_KEY }}' | base64 -w 0)" >> $GITHUB_OUTPUT
       - name: Deploy to Nais gcp
         uses: nais/deploy/actions/deploy@v2
         env:
           TZ: Europe/Oslo
           CLUSTER: prod-gcp
           RESOURCE: nais-prod.yml
-          VAR: image=${{ steps.replace-tag.outputs.IMAGE }}
+          VAR: image=${{ steps.replace-tag.outputs.IMAGE }},github_app_id=${{ secrets.APP_ID }},github_app_private_key=${{ steps.encode-key.outputs.ENCODED_KEY }}
           TELEMETRY: ${{ steps.docker-build-push.outputs.telemetry }}
