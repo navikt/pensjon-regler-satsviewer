@@ -123,33 +123,36 @@ async function fetchProdHistory(): Promise<SatsHistoryEntry[]> {
         author: { login: string } | null;
     }> = await response.json();
 
-    const entries: SatsHistoryEntry[] = [];
+    // Hent filinnhold for alle commits parallelt
+    const results = await Promise.all(
+        commits.map(async (commit) => {
+            try {
+                const fileResponse = await fetchFromGitHub(
+                    `/repos/navikt/pensjon-regler/contents/repository/nav-sats-pensjon/src/main/kotlin/no/nav/sats/pensjon/config/SatsServiceInitializer.kt?ref=${commit.sha}`
+                );
+                if (!fileResponse.ok) return null;
 
-    for (const commit of commits) {
-        try {
-            const fileResponse = await fetchFromGitHub(
-                `/repos/navikt/pensjon-regler/contents/repository/nav-sats-pensjon/src/main/kotlin/no/nav/sats/pensjon/config/SatsServiceInitializer.kt?ref=${commit.sha}`
-            );
-            if (!fileResponse.ok) continue;
+                const fileData: { content: string } = await fileResponse.json();
+                const content = atob(fileData.content.replace(/\n/g, ''));
 
-            const fileData: { content: string } = await fileResponse.json();
-            const content = atob(fileData.content.replace(/\n/g, ''));
+                const match = content.match(/PROD_SATSTABELL\s*=\s*"([^"]+)"/);
+                if (!match) return null;
 
-            const match = content.match(/PROD_SATSTABELL\s*=\s*"([^"]+)"/);
-            if (match) {
-                entries.push({
+                return {
                     environment: 'prod',
                     satstabell: match[1],
                     version: commit.sha.substring(0, 12),
                     timestamp: commit.commit.author.date,
                     actor: commit.author?.login || commit.commit.author.name,
                     runId: 0,
-                });
+                } as SatsHistoryEntry;
+            } catch {
+                return null;
             }
-        } catch {
-            // Hopp over hvis filen ikke finnes på denne committen
-        }
-    }
+        })
+    );
+
+    const entries = results.filter((x): x is SatsHistoryEntry => x !== null);
 
     // Mange commits endrer filen uten å endre satstabell — behold kun faktiske endringer
     return entries.filter((entry, i, arr) =>
@@ -159,36 +162,42 @@ async function fetchProdHistory(): Promise<SatsHistoryEntry[]> {
 
 async function fetchStandaloneDeployHistory(workflowId: number, env: string): Promise<SatsHistoryEntry[]> {
     const runs = await fetchWorkflowRuns(workflowId, 15);
-    const entries: SatsHistoryEntry[] = [];
 
-    for (const run of runs) {
-        const jobs = await fetchJobsForRun(run.id);
-        const successJob = jobs.find(j => j.conclusion === 'success');
+    // Hent alle jobber parallelt
+    const runsWithJobs = await Promise.all(
+        runs.map(async run => ({
+            run,
+            jobs: await fetchJobsForRun(run.id).catch(() => [] as WorkflowJob[]),
+        }))
+    );
 
-        if (successJob) {
-            try {
-                const logs = await fetchJobLogs(successJob.id);
-                if (!logs) continue;
-                const satstabell = parseSatstabell(logs);
-                const version = parseVersion(logs);
+    // Finn matching jobb per run, hent logger parallelt
+    const jobsToFetch = runsWithJobs
+        .map(({ run, jobs }) => {
+            const job = jobs.find(j => j.conclusion === 'success');
+            return job ? { run, job } : null;
+        })
+        .filter((x): x is { run: WorkflowRun; job: WorkflowJob } => x !== null);
 
-                if (satstabell) {
-                    entries.push({
-                        environment: env,
-                        satstabell,
-                        version: version || 'unknown',
-                        timestamp: successJob.completed_at || run.created_at,
-                        actor: run.actor.login,
-                        runId: run.id,
-                    });
-                }
-            } catch {
-                // Skip
-            }
-        }
-    }
+    const results = await Promise.all(
+        jobsToFetch.map(async ({ run, job }) => {
+            const logs = await fetchJobLogs(job.id);
+            if (!logs) return null;
+            const satstabell = parseSatstabell(logs);
+            const version = parseVersion(logs);
+            if (!satstabell) return null;
+            return {
+                environment: env,
+                satstabell,
+                version: version || 'unknown',
+                timestamp: job.completed_at || run.created_at,
+                actor: run.actor.login,
+                runId: run.id,
+            } as SatsHistoryEntry;
+        })
+    );
 
-    return entries;
+    return results.filter((x): x is SatsHistoryEntry => x !== null);
 }
 
 /**
@@ -230,41 +239,45 @@ export async function fetchHistoryForEnvironment(env: string): Promise<SatsHisto
 
 /** Henter sandbox-historikk filtrert til ett miljø */
 async function fetchSandboxHistoryForEnv(env: string): Promise<SatsHistoryEntry[]> {
-    const runs = await fetchWorkflowRuns(WORKFLOW_IDS.sandbox);
-    const entries: SatsHistoryEntry[] = [];
+    const runs = await fetchWorkflowRuns(WORKFLOW_IDS.sandbox, 15);
     const patterns = ENV_JOB_PATTERNS[env];
     if (!patterns) return [];
 
-    for (const run of runs) {
-        const jobs = await fetchJobsForRun(run.id);
-        const envJob = jobs.find(j =>
-            patterns.some(p => j.name === p) && j.conclusion === 'success'
-        );
+    // Hent alle jobber parallelt
+    const runsWithJobs = await Promise.all(
+        runs.map(async run => ({
+            run,
+            jobs: await fetchJobsForRun(run.id).catch(() => [] as WorkflowJob[]),
+        }))
+    );
 
-        if (envJob) {
-            try {
-                const logs = await fetchJobLogs(envJob.id);
-                if (!logs) continue;
-                const satstabell = parseSatstabell(logs);
-                const version = parseVersion(logs);
+    // Finn matching deploy-jobb per run, hent logger parallelt
+    const jobsToFetch = runsWithJobs
+        .map(({ run, jobs }) => {
+            const job = jobs.find(j => patterns.some(p => j.name === p) && j.conclusion === 'success');
+            return job ? { run, job } : null;
+        })
+        .filter((x): x is { run: WorkflowRun; job: WorkflowJob } => x !== null);
 
-                if (satstabell) {
-                    entries.push({
-                        environment: env,
-                        satstabell,
-                        version: version || 'unknown',
-                        timestamp: envJob.completed_at || run.created_at,
-                        actor: run.actor.login,
-                        runId: run.id,
-                    });
-                }
-            } catch {
-                // Hopp over hvis logger er utilgjengelige
-            }
-        }
-    }
+    const results = await Promise.all(
+        jobsToFetch.map(async ({ run, job }) => {
+            const logs = await fetchJobLogs(job.id);
+            if (!logs) return null;
+            const satstabell = parseSatstabell(logs);
+            const version = parseVersion(logs);
+            if (!satstabell) return null;
+            return {
+                environment: env,
+                satstabell,
+                version: version || 'unknown',
+                timestamp: job.completed_at || run.created_at,
+                actor: run.actor.login,
+                runId: run.id,
+            } as SatsHistoryEntry;
+        })
+    );
 
-    return entries;
+    return results.filter((x): x is SatsHistoryEntry => x !== null);
 }
 
 export const useSatsHistory = (env: string | null): UseQueryResult<SatsHistoryEntry[], Error> =>
