@@ -109,50 +109,6 @@ function parseVersion(logContent: string): string | null {
     return match ? match[1] : null;
 }
 
-async function fetchSandboxHistory(): Promise<SatsHistoryEntry[]> {
-    // Sandbox-workflowen deployer alle Q-miljøer (q1/q2/q5) i én kjøring
-    const runs = await fetchWorkflowRuns(WORKFLOW_IDS.sandbox);
-    const entries: SatsHistoryEntry[] = [];
-
-    for (const run of runs) {
-        const jobs = await fetchJobsForRun(run.id);
-
-        for (const [env, patterns] of Object.entries(ENV_JOB_PATTERNS)) {
-            // Prod/Q0 bruker git-historikk i stedet (hardkodet konstant)
-            if (env === 'prod' || env === 'q0') continue;
-
-            const envJob = jobs.find(j =>
-                patterns.some(p => j.name === p) && j.conclusion === 'success'
-            );
-
-            if (envJob) {
-                try {
-                    const logs = await fetchJobLogs(envJob.id);
-                    if (!logs) continue;
-                    const satstabell = parseSatstabell(logs);
-                    const version = parseVersion(logs);
-
-                    if (satstabell) {
-                        entries.push({
-                            environment: env,
-                            satstabell,
-                            version: version || 'unknown',
-                            // Bruker jobb-ferdigtidspunkt, ikke workflow-start (som inkluderer byggetid)
-                            timestamp: envJob.completed_at || run.created_at,
-                            actor: run.actor.login,
-                            runId: run.id,
-                        });
-                    }
-                } catch {
-                    // Hopp over hvis logger er utilgjengelige
-                }
-            }
-        }
-    }
-
-    return entries;
-}
-
 async function fetchProdHistory(): Promise<SatsHistoryEntry[]> {
     // Prod/Q0 satstabell er hardkodet i SatsServiceInitializer.kt (PROD_SATSTABELL).
     // Sporer endringer via git-historikken til filen.
@@ -235,24 +191,36 @@ async function fetchStandaloneDeployHistory(workflowId: number, env: string): Pr
     return entries;
 }
 
-export async function fetchAllSatsHistory(): Promise<SatsHistoryEntry[]> {
-    const [sandbox, prod, q1, q2, q5] = await Promise.all([
-        fetchSandboxHistory().catch(() => []),
-        fetchProdHistory().catch(() => []),
-        fetchStandaloneDeployHistory(WORKFLOW_IDS.deployQ1, 'q1').catch(() => []),
-        fetchStandaloneDeployHistory(WORKFLOW_IDS.deployQ2, 'q2').catch(() => []),
-        fetchStandaloneDeployHistory(WORKFLOW_IDS.deployQ5, 'q5').catch(() => []),
-    ]);
+/**
+ * Henter historikk for ett spesifikt miljø.
+ * For Q-miljøer sjekkes både sandbox-workflowen og den dedikerte deploy-workflowen.
+ */
+export async function fetchHistoryForEnvironment(env: string): Promise<SatsHistoryEntry[]> {
+    let entries: SatsHistoryEntry[] = [];
 
-    const all = [...sandbox, ...prod, ...q1, ...q2, ...q5];
+    if (env === 'prod') {
+        entries = await fetchProdHistory();
+    } else {
+        const standaloneId = env === 'q1' ? WORKFLOW_IDS.deployQ1
+            : env === 'q2' ? WORKFLOW_IDS.deployQ2
+            : env === 'q5' ? WORKFLOW_IDS.deployQ5
+            : null;
 
-    all.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        const [sandboxEntries, standaloneEntries] = await Promise.all([
+            fetchSandboxHistoryForEnv(env).catch(() => []),
+            standaloneId ? fetchStandaloneDeployHistory(standaloneId, env).catch(() => []) : Promise.resolve([]),
+        ]);
+
+        entries = [...sandboxEntries, ...standaloneEntries];
+    }
+
+    entries.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
     // Dedupliser: sandbox og standalone kan logge samme deploy — fjern duplikater innen 1 time
-    return all.filter((entry, i, arr) => {
+    return entries.filter((entry, i, arr) => {
         if (i === 0) return true;
         const prev = arr[i - 1];
-        if (entry.environment === prev.environment && entry.satstabell === prev.satstabell) {
+        if (entry.satstabell === prev.satstabell) {
             const timeDiff = Math.abs(new Date(entry.timestamp).getTime() - new Date(prev.timestamp).getTime());
             if (timeDiff < 3600000) return false;
         }
@@ -260,10 +228,50 @@ export async function fetchAllSatsHistory(): Promise<SatsHistoryEntry[]> {
     });
 }
 
-export const useSatsHistory = (): UseQueryResult<SatsHistoryEntry[], Error> =>
+/** Henter sandbox-historikk filtrert til ett miljø */
+async function fetchSandboxHistoryForEnv(env: string): Promise<SatsHistoryEntry[]> {
+    const runs = await fetchWorkflowRuns(WORKFLOW_IDS.sandbox);
+    const entries: SatsHistoryEntry[] = [];
+    const patterns = ENV_JOB_PATTERNS[env];
+    if (!patterns) return [];
+
+    for (const run of runs) {
+        const jobs = await fetchJobsForRun(run.id);
+        const envJob = jobs.find(j =>
+            patterns.some(p => j.name === p) && j.conclusion === 'success'
+        );
+
+        if (envJob) {
+            try {
+                const logs = await fetchJobLogs(envJob.id);
+                if (!logs) continue;
+                const satstabell = parseSatstabell(logs);
+                const version = parseVersion(logs);
+
+                if (satstabell) {
+                    entries.push({
+                        environment: env,
+                        satstabell,
+                        version: version || 'unknown',
+                        timestamp: envJob.completed_at || run.created_at,
+                        actor: run.actor.login,
+                        runId: run.id,
+                    });
+                }
+            } catch {
+                // Hopp over hvis logger er utilgjengelige
+            }
+        }
+    }
+
+    return entries;
+}
+
+export const useSatsHistory = (env: string | null): UseQueryResult<SatsHistoryEntry[], Error> =>
     useQuery({
-        queryKey: ['satsHistory'],
-        queryFn: fetchAllSatsHistory,
-        staleTime: 5 * 60 * 1000, // 5 minutes
+        queryKey: ['satsHistory', env],
+        queryFn: () => fetchHistoryForEnvironment(env!),
+        enabled: !!env,
+        staleTime: 5 * 60 * 1000,
         retry: 1,
     });
