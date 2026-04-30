@@ -15,6 +15,9 @@ COPY . .
 RUN pnpm run build
 
 FROM cgr.dev/chainguard/nginx:latest-dev
+USER root
+RUN apk add --no-cache openssl curl
+USER nonroot
 COPY --from=build --chown=nonroot:nonroot /app/dist /usr/share/nginx/html
 COPY --chown=nonroot:nonroot ./config/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --chmod=755 --chown=nonroot:nonroot ./config/entrypoint.sh /entrypoint.sh
