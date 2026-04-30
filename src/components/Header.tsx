@@ -8,16 +8,17 @@ interface HeaderProps {
     isProduction: boolean;
     showHistoryLink?: boolean;
     showBackLink?: boolean;
+    currentEnvironment?: string;
 }
 
-const Header: FC<HeaderProps> = ({ onChangedEnvironment, isProduction, showHistoryLink = true, showBackLink = false }) => {
+const Header: FC<HeaderProps> = ({ onChangedEnvironment, isProduction, showHistoryLink = true, showBackLink = false, currentEnvironment }) => {
 
     return (
         <InternalHeader>
             <InternalHeader.Title as="h1">pensjon-regler-satsviewer</InternalHeader.Title>
             <Spacer />
             {showHistoryLink && (
-                <Link to="/historikk" style={{ color: 'white', textDecoration: 'none', padding: '0 1rem', display: 'flex', alignItems: 'center' }}>
+                <Link to={`/historikk${currentEnvironment ? `?env=${currentEnvironment}` : ''}`} style={{ color: 'white', textDecoration: 'none', padding: '0 1rem', display: 'flex', alignItems: 'center' }}>
                     Satshistorikk
                 </Link>
             )}

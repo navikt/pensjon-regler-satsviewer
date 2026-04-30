@@ -3,8 +3,9 @@ import { Alert, Box, Heading, Loader, Page, Select, Table } from "@navikt/ds-rea
 import { useSatsHistory } from '../service/SatsHistoryService';
 import Header from './Header';
 import { isProduction } from '../utils/environment';
+import { useSearchParams } from 'react-router-dom';
 
-const ENVIRONMENTS = ['q1', 'q2', 'q5', 'prod'];
+const ENVIRONMENTS = ['q1', 'q2', 'q5'];
 
 const formatDate = (iso: string): string => {
     const date = new Date(iso);
@@ -18,7 +19,11 @@ const formatDate = (iso: string): string => {
 };
 
 const HistoryPage: FC = () => {
-    const [selectedEnv, setSelectedEnv] = useState<string | null>(null);
+    const [searchParams] = useSearchParams();
+    const initialEnv = searchParams.get('env');
+    const [selectedEnv, setSelectedEnv] = useState<string | null>(
+        initialEnv && ENVIRONMENTS.includes(initialEnv) ? initialEnv : null
+    );
     const { data, isLoading, error } = useSatsHistory(selectedEnv);
     const isProd = isProduction();
 

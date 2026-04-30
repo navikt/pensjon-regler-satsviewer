@@ -47,7 +47,7 @@ const AppPage: FC = () => {
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
             <Page>
-                <Header onChangedEnvironment={onChangedEnvironment} isProduction={isProd}/>
+                <Header onChangedEnvironment={onChangedEnvironment} isProduction={isProd} showHistoryLink={!isProd} currentEnvironment={environment}/>
                 <Box
                     padding="space-32"
                     paddingBlock="space-64"
