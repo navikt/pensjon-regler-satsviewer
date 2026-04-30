@@ -39,7 +39,7 @@ const HistoryPage: FC = () => {
         return [...new Set(data.map(e => e.environment))].sort();
     }, [data]);
 
-    // Group by satstabell changes per environment
+    // Første entry per miljø (sortert nyest først) = nåværende aktiv satstabell
     const currentSatsPerEnv = useMemo(() => {
         if (!data) return new Map<string, SatsHistoryEntry>();
         const map = new Map<string, SatsHistoryEntry>();

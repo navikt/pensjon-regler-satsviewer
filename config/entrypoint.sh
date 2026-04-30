@@ -6,11 +6,11 @@ if [ -z "$GITHUB_APP_PRIVATE_KEY" ]; then
   exec nginx -g 'daemon off;'
 fi
 
-# Decode the base64-encoded private key
+# NAIS VAR-format er kommaseparert, så flerlinjers PEM-nøkler må base64-encodes først
 echo "$GITHUB_APP_PRIVATE_KEY" | base64 -d > /tmp/github-app-key.pem
 chmod 600 /tmp/github-app-key.pem
 
-# Generate JWT for GitHub App authentication
+# Generer JWT for GitHub App-autentisering
 generate_jwt() {
   NOW=$(date +%s)
   IAT=$((NOW - 60))
@@ -23,7 +23,7 @@ generate_jwt() {
   printf '%s.%s.%s' "$HEADER" "$PAYLOAD" "$SIGNATURE"
 }
 
-# Exchange JWT for an installation access token
+# Bytt JWT mot en installation access token
 get_installation_token() {
   JWT=$(generate_jwt)
 
@@ -50,7 +50,7 @@ get_installation_token() {
   echo "$TOKEN"
 }
 
-# Generate token and inject into nginx config
+# Sett token inn i nginx-konfig
 TOKEN=$(get_installation_token)
 if [ -n "$TOKEN" ]; then
   sed -i "s|GITHUB_APP_TOKEN_PLACEHOLDER|${TOKEN}|g" /etc/nginx/conf.d/default.conf
@@ -59,7 +59,7 @@ else
   echo "WARNING: Failed to get GitHub token, history page will not work"
 fi
 
-# Background job: refresh token every 50 minutes
+# GitHub App installation tokens utløper etter 1 time — refresh hver 50. minutt
 (
   while true; do
     sleep 3000

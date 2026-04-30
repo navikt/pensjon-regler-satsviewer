@@ -16,6 +16,8 @@ RUN pnpm run build
 
 FROM cgr.dev/chainguard/nginx:latest-dev
 USER root
+# openssl+curl trengs av entrypoint.sh for JWT-signering og GitHub API-kall.
+# chmod conf.d slik at nonroot-brukeren kan sed-e inn token ved oppstart.
 RUN apk add --no-cache openssl curl && chmod 777 /etc/nginx/conf.d
 USER nonroot
 COPY --from=build --chown=nonroot:nonroot /app/dist /usr/share/nginx/html
