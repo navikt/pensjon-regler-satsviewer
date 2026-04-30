@@ -1,6 +1,15 @@
 #!/bin/sh
 set -e
 
+if [ -z "$GITHUB_APP_PRIVATE_KEY" ]; then
+  echo "WARNING: GITHUB_APP_PRIVATE_KEY is empty - starting without GitHub token"
+  exec nginx -g 'daemon off;'
+fi
+
+# Decode the base64-encoded private key
+echo "$GITHUB_APP_PRIVATE_KEY" | base64 -d > /tmp/github-app-key.pem
+chmod 600 /tmp/github-app-key.pem
+
 # Generate JWT for GitHub App authentication
 generate_jwt() {
   NOW=$(date +%s)
@@ -39,13 +48,14 @@ get_installation_token() {
   echo "$TOKEN"
 }
 
-# Write private key from env to file
-echo "$GITHUB_APP_PRIVATE_KEY" > /tmp/github-app-key.pem
-chmod 600 /tmp/github-app-key.pem
-
 # Generate token and inject into nginx config
 TOKEN=$(get_installation_token)
-sed -i "s|GITHUB_APP_TOKEN_PLACEHOLDER|${TOKEN}|g" /etc/nginx/conf.d/default.conf
+if [ -n "$TOKEN" ]; then
+  sed -i "s|GITHUB_APP_TOKEN_PLACEHOLDER|${TOKEN}|g" /etc/nginx/conf.d/default.conf
+  echo "GitHub App token injected successfully"
+else
+  echo "WARNING: Failed to get GitHub token, history page will not work"
+fi
 
 # Background job: refresh token every 50 minutes
 (

@@ -16,10 +16,13 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v6
+      - name: Encode GitHub App private key
+        id: encode-key
+        run: echo "ENCODED_KEY=$(echo '${{ secrets.APP_PRIVATE_KEY }}' | base64 -w 0)" >> $GITHUB_OUTPUT
       - name: Deploy to Nais
         uses: nais/deploy/actions/deploy@v2
         env:
           TZ: Europe/Oslo
           CLUSTER: dev-gcp
           RESOURCE: nais.yml
-          VAR: image=europe-north1-docker.pkg.dev/nais-management-233d/pensjon-regler/pensjon-regler-satsviewer:${{ github.event.inputs.tag }},github_app_id=${{ secrets.APP_ID }},github_app_private_key=${{ secrets.APP_PRIVATE_KEY }}
+          VAR: image=europe-north1-docker.pkg.dev/nais-management-233d/pensjon-regler/pensjon-regler-satsviewer:${{ github.event.inputs.tag }},github_app_id=${{ secrets.APP_ID }},github_app_private_key=${{ steps.encode-key.outputs.ENCODED_KEY }}
