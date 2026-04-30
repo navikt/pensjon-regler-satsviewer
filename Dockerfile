@@ -16,7 +16,7 @@ RUN pnpm run build
 
 FROM cgr.dev/chainguard/nginx:latest-dev
 USER root
-RUN apk add --no-cache openssl curl
+RUN apk add --no-cache openssl curl && chmod 777 /etc/nginx/conf.d
 USER nonroot
 COPY --from=build --chown=nonroot:nonroot /app/dist /usr/share/nginx/html
 COPY --chown=nonroot:nonroot ./config/nginx/nginx.conf /etc/nginx/conf.d/default.conf
