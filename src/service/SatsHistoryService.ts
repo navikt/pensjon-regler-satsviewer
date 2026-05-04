@@ -218,10 +218,14 @@ export async function fetchAllSatsHistory(): Promise<SatsHistoryEntry[]> {
     });
 }
 
+// Cache i 1 time — unngår unødvendige GitHub API-kall ved navigering/refresh
+const CACHE_TTL = 60 * 60 * 1000;
+
 export const useSatsHistory = (): UseQueryResult<SatsHistoryEntry[], Error> =>
     useQuery({
         queryKey: ['satsHistory'],
         queryFn: fetchAllSatsHistory,
-        staleTime: 5 * 60 * 1000,
+        staleTime: CACHE_TTL,
+        gcTime: CACHE_TTL,
         retry: 1,
     });
