@@ -56,12 +56,12 @@ const WORKFLOW_IDS = {
     deployQ5: 13932626,
 };
 
+// Kun FSS — GCP deployer samme satstabell, så vi slipper å hente begge logger
 const ENV_JOB_PATTERNS: Record<string, string[]> = {
-    q1: ['Deploy Q1 FSS', 'Deploy Q1 GCP'],
-    q2: ['Deploy Q2 FSS', 'Deploy Q2 GCP'],
-    q5: ['Deploy Q5 FSS', 'Deploy Q5 GCP'],
+    q1: ['Deploy Q1 FSS'],
+    q2: ['Deploy Q2 FSS'],
+    q5: ['Deploy Q5 FSS'],
 };
-
 async function fetchFromGitHub(path: string): Promise<Response> {
     return fetch(`${GITHUB_API_PROXY}${path}`, {
         headers: { 'Accept': 'application/json' },
