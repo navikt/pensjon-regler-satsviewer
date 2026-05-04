@@ -2,6 +2,7 @@ name: Automerge Dependabot
 
 on:
   pull_request:
+    branches: [main]
     types: [opened, synchronize, labeled, ready_for_review]
   schedule:
     - cron: "0 7 * * *" # daily at 07:00 UTC
