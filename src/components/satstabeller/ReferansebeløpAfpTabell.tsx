@@ -56,7 +56,7 @@ const ReferansebeløpAfpTabell: FC<ReferansebeløpAfpTabellProps> = ({ environme
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {data.satser.map((rad: ReferansebeløpAfpSats, key: number) => (
+                                {[...data.satser].sort((a, b) => b.satsFom[0] - a.satsFom[0]).map((rad: ReferansebeløpAfpSats, key: number) => (
                                     <Table.Row key={key}>
                                         <Table.DataCell>{rad.satsFom[0] < 0 ? 'N/A' : `${rad.satsFom[2]}-${rad.satsFom[1]}-${rad.satsFom[0]}`}</Table.DataCell>
                                         {kulls.map(kull => (
