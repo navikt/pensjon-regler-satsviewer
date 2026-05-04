@@ -10,6 +10,8 @@ import { useQuery, UseQueryResult } from "@tanstack/react-query";
  * Kun tilgjengelig i dev-miljø.
  */
 
+const GITHUB_API_PROXY = '/github-api';
+
 export interface SatsHistoryEntry {
     environment: string;
     satstabell: string;
@@ -44,7 +46,8 @@ interface WorkflowJobsResponse {
     jobs: WorkflowJob[];
 }
 
-const GITHUB_API_PROXY = '/github-api';
+// Antall workflow-runs å hente per workflow (mer = lengre historikk, men tregere)
+const RUNS_PER_WORKFLOW = 100;
 
 const WORKFLOW_IDS = {
     sandbox: 200229765,
@@ -106,8 +109,53 @@ function parseVersion(logContent: string): string | null {
     return match ? match[1] : null;
 }
 
+/** Henter alle Q-miljøer fra sandbox-workflowen i ett pass */
+async function fetchSandboxHistory(): Promise<SatsHistoryEntry[]> {
+    const runs = await fetchWorkflowRuns(WORKFLOW_IDS.sandbox, RUNS_PER_WORKFLOW);
+
+    // Hent alle jobber parallelt
+    const runsWithJobs = await Promise.all(
+        runs.map(async run => ({
+            run,
+            jobs: await fetchJobsForRun(run.id).catch(() => [] as WorkflowJob[]),
+        }))
+    );
+
+    // For hver run, finn deploy-jobb for hvert miljø
+    const logFetches: Promise<SatsHistoryEntry | null>[] = [];
+
+    for (const { run, jobs } of runsWithJobs) {
+        for (const [env, patterns] of Object.entries(ENV_JOB_PATTERNS)) {
+            const job = jobs.find(j => patterns.some(p => j.name === p) && j.conclusion === 'success');
+            if (job) {
+                logFetches.push(
+                    fetchJobLogs(job.id).then(logs => {
+                        if (!logs) return null;
+                        const satstabell = parseSatstabell(logs);
+                        const version = parseVersion(logs);
+                        if (!satstabell) return null;
+                        return {
+                            environment: env,
+                            satstabell,
+                            version: version || 'unknown',
+                            // Bruker jobb-ferdigtidspunkt, ikke workflow-start (inkluderer byggetid)
+                            timestamp: job.completed_at || run.created_at,
+                            actor: run.actor.login,
+                            runId: run.id,
+                        } as SatsHistoryEntry;
+                    }).catch(() => null)
+                );
+            }
+        }
+    }
+
+    const results = await Promise.all(logFetches);
+    return results.filter((x): x is SatsHistoryEntry => x !== null);
+}
+
+/** Henter historikk fra en standalone deploy-workflow (deploy-q1, deploy-q2, deploy-q5) */
 async function fetchStandaloneDeployHistory(workflowId: number, env: string): Promise<SatsHistoryEntry[]> {
-    const runs = await fetchWorkflowRuns(workflowId, 50);
+    const runs = await fetchWorkflowRuns(workflowId, RUNS_PER_WORKFLOW);
 
     // Hent alle jobber parallelt
     const runsWithJobs = await Promise.all(
@@ -146,29 +194,23 @@ async function fetchStandaloneDeployHistory(workflowId: number, env: string): Pr
     return results.filter((x): x is SatsHistoryEntry => x !== null);
 }
 
-/**
- * Henter historikk for ett spesifikt Q-miljø.
- * Sjekker både sandbox-workflowen og den dedikerte deploy-workflowen.
- */
-export async function fetchHistoryForEnvironment(env: string): Promise<SatsHistoryEntry[]> {
-    const standaloneId = env === 'q1' ? WORKFLOW_IDS.deployQ1
-        : env === 'q2' ? WORKFLOW_IDS.deployQ2
-        : env === 'q5' ? WORKFLOW_IDS.deployQ5
-        : null;
-
-    const [sandboxEntries, standaloneEntries] = await Promise.all([
-        fetchSandboxHistoryForEnv(env).catch(() => []),
-        standaloneId ? fetchStandaloneDeployHistory(standaloneId, env).catch(() => []) : Promise.resolve([]),
+/** Henter all satshistorikk for alle Q-miljøer */
+export async function fetchAllSatsHistory(): Promise<SatsHistoryEntry[]> {
+    const [sandbox, q1, q2, q5] = await Promise.all([
+        fetchSandboxHistory().catch(() => []),
+        fetchStandaloneDeployHistory(WORKFLOW_IDS.deployQ1, 'q1').catch(() => []),
+        fetchStandaloneDeployHistory(WORKFLOW_IDS.deployQ2, 'q2').catch(() => []),
+        fetchStandaloneDeployHistory(WORKFLOW_IDS.deployQ5, 'q5').catch(() => []),
     ]);
 
-    const entries = [...sandboxEntries, ...standaloneEntries];
-    entries.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    const all = [...sandbox, ...q1, ...q2, ...q5];
+    all.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-    // Dedupliser: sandbox og standalone kan logge samme deploy — fjern duplikater innen 1 time
-    return entries.filter((entry, i, arr) => {
+    // Dedupliser: om samme satstabell ble deployet flere ganger på kort tid, vis kun én entry
+    return all.filter((entry, i, arr) => {
         if (i === 0) return true;
         const prev = arr[i - 1];
-        if (entry.satstabell === prev.satstabell) {
+        if (entry.environment === prev.environment && entry.satstabell === prev.satstabell) {
             const timeDiff = Math.abs(new Date(entry.timestamp).getTime() - new Date(prev.timestamp).getTime());
             if (timeDiff < 3600000) return false;
         }
@@ -176,54 +218,10 @@ export async function fetchHistoryForEnvironment(env: string): Promise<SatsHisto
     });
 }
 
-/** Henter sandbox-historikk filtrert til ett miljø */
-async function fetchSandboxHistoryForEnv(env: string): Promise<SatsHistoryEntry[]> {
-    const runs = await fetchWorkflowRuns(WORKFLOW_IDS.sandbox, 50);
-    const patterns = ENV_JOB_PATTERNS[env];
-    if (!patterns) return [];
-
-    // Hent alle jobber parallelt
-    const runsWithJobs = await Promise.all(
-        runs.map(async run => ({
-            run,
-            jobs: await fetchJobsForRun(run.id).catch(() => [] as WorkflowJob[]),
-        }))
-    );
-
-    // Finn matching deploy-jobb per run, hent logger parallelt
-    const jobsToFetch = runsWithJobs
-        .map(({ run, jobs }) => {
-            const job = jobs.find(j => patterns.some(p => j.name === p) && j.conclusion === 'success');
-            return job ? { run, job } : null;
-        })
-        .filter((x): x is { run: WorkflowRun; job: WorkflowJob } => x !== null);
-
-    const results = await Promise.all(
-        jobsToFetch.map(async ({ run, job }) => {
-            const logs = await fetchJobLogs(job.id);
-            if (!logs) return null;
-            const satstabell = parseSatstabell(logs);
-            const version = parseVersion(logs);
-            if (!satstabell) return null;
-            return {
-                environment: env,
-                satstabell,
-                version: version || 'unknown',
-                timestamp: job.completed_at || run.created_at,
-                actor: run.actor.login,
-                runId: run.id,
-            } as SatsHistoryEntry;
-        })
-    );
-
-    return results.filter((x): x is SatsHistoryEntry => x !== null);
-}
-
-export const useSatsHistory = (env: string | null): UseQueryResult<SatsHistoryEntry[], Error> =>
+export const useSatsHistory = (): UseQueryResult<SatsHistoryEntry[], Error> =>
     useQuery({
-        queryKey: ['satsHistory', env],
-        queryFn: () => fetchHistoryForEnvironment(env!),
-        enabled: !!env,
+        queryKey: ['satsHistory'],
+        queryFn: fetchAllSatsHistory,
         staleTime: 5 * 60 * 1000,
         retry: 1,
     });
