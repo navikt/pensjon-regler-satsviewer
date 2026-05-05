@@ -1,16 +1,11 @@
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
-
 /**
- * Henter satshistorikk ved å parse GitHub Actions deploy-logger.
- *
- * - Q1/Q2/Q5: Parses fra Slack-notifikasjonssteget i deploy-jobb-logger (inneholder "satstabell: X")
- *
- * Krever GitHub App "pensjon-regler-tokens" med actions:read.
- * Logger er kun tilgjengelig i 90 dager.
- * Kun tilgjengelig i dev-miljø.
+ * Satshistorikk — parser deploy-historikk fra GitHub Actions logger.
+ * Kun tilgjengelig i dev (logger utløper etter 90 dager).
  */
 
-const GITHUB_API_PROXY = '/github-api';
+import { fetchWorkflowRuns, fetchJobsForRun, fetchJobLogs, WorkflowRun, WorkflowJob } from './githubApi';
+
+// ─── Typer ───────────────────────────────────────────────────────────────────
 
 export interface SatsHistoryEntry {
     environment: string;
@@ -21,35 +16,12 @@ export interface SatsHistoryEntry {
     runId: number;
 }
 
-interface WorkflowRun {
-    id: number;
-    name: string;
-    created_at: string;
-    actor: { login: string };
-    conclusion: string;
-    status: string;
-}
+// ─── Konfigurasjon ───────────────────────────────────────────────────────────
 
-interface WorkflowRunsResponse {
-    workflow_runs: WorkflowRun[];
-}
-
-interface WorkflowJob {
-    id: number;
-    name: string;
-    conclusion: string;
-    completed_at: string | null;
-    steps: { name: string; conclusion: string }[];
-}
-
-interface WorkflowJobsResponse {
-    jobs: WorkflowJob[];
-}
-
-// Antall workflow-runs å hente per workflow ved første innlasting (full historikk)
+/** Antall runs å hente ved første innlasting (full historikk) */
 const RUNS_FULL_FETCH = 150;
 
-// Antall workflow-runs å hente ved oppdatering (kun sjekke om noe nytt har skjedd)
+/** Antall runs å hente ved refresh (sjekke om noe nytt har skjedd) */
 const RUNS_REFRESH_FETCH = 5;
 
 const WORKFLOW_IDS = {
@@ -59,96 +31,75 @@ const WORKFLOW_IDS = {
     deployQ5: 13932626,
 };
 
-// Kun FSS — GCP deployer samme satstabell, så vi slipper å hente begge logger
-const ENV_JOB_PATTERNS: Record<string, string[]> = {
-    q1: ['Deploy Q1 FSS'],
-    q2: ['Deploy Q2 FSS'],
-    q5: ['Deploy Q5 FSS'],
+/** Kun FSS — GCP deployer samme satstabell */
+const SANDBOX_JOB_NAMES: Record<string, string> = {
+    q1: 'Deploy Q1 FSS',
+    q2: 'Deploy Q2 FSS',
+    q5: 'Deploy Q5 FSS',
 };
-async function fetchFromGitHub(path: string): Promise<Response> {
-    return fetch(`${GITHUB_API_PROXY}${path}`, {
-        headers: { 'Accept': 'application/json' },
-    });
-}
 
-async function fetchWorkflowRuns(workflowId: number, perPage = 30): Promise<WorkflowRun[]> {
-    // GitHub beholder jobb-logger i kun 90 dager — unngår å hente eldre runs
-    const since = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    const response = await fetchFromGitHub(
-        `/repos/navikt/pensjon-regler/actions/workflows/${workflowId}/runs?status=completed&conclusion=success&per_page=${perPage}&created=>${since}`
-    );
-    if (!response.ok) throw new Error(`GitHub API error: ${response.status}`);
-    const data: WorkflowRunsResponse = await response.json();
-    return data.workflow_runs;
-}
+// ─── Parsing ─────────────────────────────────────────────────────────────────
 
-async function fetchJobLogs(jobId: number): Promise<string | null> {
-    const response = await fetchFromGitHub(`/repos/navikt/pensjon-regler/actions/jobs/${jobId}/logs`);
-    if (response.status === 410) return null; // 410 Gone = logger utløpt (eldre enn 90 dager)
-    if (!response.ok) return null;
-    return response.text();
-}
-
-async function fetchJobsForRun(runId: number): Promise<WorkflowJob[]> {
-    const response = await fetchFromGitHub(`/repos/navikt/pensjon-regler/actions/runs/${runId}/jobs`);
-    if (!response.ok) throw new Error(`GitHub API error: ${response.status}`);
-    const data: WorkflowJobsResponse = await response.json();
-    return data.jobs;
-}
-
-function parseSatstabell(logContent: string): string | null {
-    // Slack-steget printer: "Deploy av X (satstabell: SAT2025) til env er ferdig."
-    const match = logContent.match(/satstabell:\s*([A-Za-z0-9_-]+)/);
-    if (match) return match[1];
-
-    const match2 = logContent.match(/satstabell_type=([A-Za-z0-9_-]+)/);
-    if (match2) return match2[1];
-
-    return null;
-}
-
-function parseVersion(logContent: string): string | null {
-    const match = logContent.match(/Deploy av\s+(\S+)/);
+/** Parser satstabell fra logg-tekst (Slack-steget: "satstabell: SAT2025") */
+function parseSatstabell(log: string): string | null {
+    const match = log.match(/satstabell:\s*([A-Za-z0-9_-]+)/)
+        || log.match(/satstabell_type=([A-Za-z0-9_-]+)/);
     return match ? match[1] : null;
 }
 
-/** Henter alle Q-miljøer fra sandbox-workflowen i ett pass */
-async function fetchSandboxHistory(perPage: number): Promise<SatsHistoryEntry[]> {
-    const runs = await fetchWorkflowRuns(WORKFLOW_IDS.sandbox, perPage);
+/** Parser versjon fra logg-tekst ("Deploy av 2025.05.01-abc123 ...") */
+function parseVersion(log: string): string | null {
+    const match = log.match(/Deploy av\s+(\S+)/);
+    return match ? match[1] : null;
+}
 
-    // Hent alle jobber parallelt
-    const runsWithJobs = await Promise.all(
+/** Bygger en SatsHistoryEntry fra en jobb-logg */
+function parseEntryFromLog(log: string, env: string, run: WorkflowRun, job: WorkflowJob): SatsHistoryEntry | null {
+    const satstabell = parseSatstabell(log);
+    if (!satstabell) return null;
+
+    return {
+        environment: env,
+        satstabell,
+        version: parseVersion(log) || 'unknown',
+        timestamp: job.completed_at || run.created_at,
+        actor: run.actor.login,
+        runId: run.id,
+    };
+}
+
+// ─── Datahenting ─────────────────────────────────────────────────────────────
+
+/** Henter jobber for alle runs parallelt */
+async function fetchJobsForRuns(runs: WorkflowRun[]): Promise<{ run: WorkflowRun; jobs: WorkflowJob[] }[]> {
+    return Promise.all(
         runs.map(async run => ({
             run,
             jobs: await fetchJobsForRun(run.id).catch(() => [] as WorkflowJob[]),
         }))
     );
+}
 
-    // For hver run, finn deploy-jobb for hvert miljø
+/**
+ * Sandbox-workflow: bygger og deployer til Q1/Q2/Q5 i parallelle jobber.
+ * Vi finner FSS-deploy-jobben for hvert miljø og parser loggen.
+ */
+async function fetchSandboxHistory(perPage: number): Promise<SatsHistoryEntry[]> {
+    const runs = await fetchWorkflowRuns(WORKFLOW_IDS.sandbox, perPage);
+    const runsWithJobs = await fetchJobsForRuns(runs);
+
     const logFetches: Promise<SatsHistoryEntry | null>[] = [];
 
     for (const { run, jobs } of runsWithJobs) {
-        for (const [env, patterns] of Object.entries(ENV_JOB_PATTERNS)) {
-            const job = jobs.find(j => patterns.some(p => j.name === p) && j.conclusion === 'success');
-            if (job) {
-                logFetches.push(
-                    fetchJobLogs(job.id).then(logs => {
-                        if (!logs) return null;
-                        const satstabell = parseSatstabell(logs);
-                        const version = parseVersion(logs);
-                        if (!satstabell) return null;
-                        return {
-                            environment: env,
-                            satstabell,
-                            version: version || 'unknown',
-                            // Bruker jobb-ferdigtidspunkt, ikke workflow-start (inkluderer byggetid)
-                            timestamp: job.completed_at || run.created_at,
-                            actor: run.actor.login,
-                            runId: run.id,
-                        } as SatsHistoryEntry;
-                    }).catch(() => null)
-                );
-            }
+        for (const [env, jobName] of Object.entries(SANDBOX_JOB_NAMES)) {
+            const job = jobs.find(j => j.name === jobName && j.conclusion === 'success');
+            if (!job) continue;
+
+            logFetches.push(
+                fetchJobLogs(job.id)
+                    .then(log => log ? parseEntryFromLog(log, env, run, job) : null)
+                    .catch(() => null)
+            );
         }
     }
 
@@ -156,20 +107,15 @@ async function fetchSandboxHistory(perPage: number): Promise<SatsHistoryEntry[]>
     return results.filter((x): x is SatsHistoryEntry => x !== null);
 }
 
-/** Henter historikk fra en standalone deploy-workflow (deploy-q1, deploy-q2, deploy-q5) */
-async function fetchStandaloneDeployHistory(workflowId: number, env: string, perPage: number): Promise<SatsHistoryEntry[]> {
+/**
+ * Standalone deploy-workflow (deploy-q1, deploy-q2, deploy-q5).
+ * Hver run har én jobb — vi henter loggen for den første vellykkede.
+ */
+async function fetchStandaloneHistory(workflowId: number, env: string, perPage: number): Promise<SatsHistoryEntry[]> {
     const runs = await fetchWorkflowRuns(workflowId, perPage);
+    const runsWithJobs = await fetchJobsForRuns(runs);
 
-    // Hent alle jobber parallelt
-    const runsWithJobs = await Promise.all(
-        runs.map(async run => ({
-            run,
-            jobs: await fetchJobsForRun(run.id).catch(() => [] as WorkflowJob[]),
-        }))
-    );
-
-    // Finn matching jobb per run, hent logger parallelt
-    const jobsToFetch = runsWithJobs
+    const toFetch = runsWithJobs
         .map(({ run, jobs }) => {
             const job = jobs.find(j => j.conclusion === 'success');
             return job ? { run, job } : null;
@@ -177,85 +123,58 @@ async function fetchStandaloneDeployHistory(workflowId: number, env: string, per
         .filter((x): x is { run: WorkflowRun; job: WorkflowJob } => x !== null);
 
     const results = await Promise.all(
-        jobsToFetch.map(async ({ run, job }) => {
-            const logs = await fetchJobLogs(job.id);
-            if (!logs) return null;
-            const satstabell = parseSatstabell(logs);
-            const version = parseVersion(logs);
-            if (!satstabell) return null;
-            return {
-                environment: env,
-                satstabell,
-                version: version || 'unknown',
-                timestamp: job.completed_at || run.created_at,
-                actor: run.actor.login,
-                runId: run.id,
-            } as SatsHistoryEntry;
+        toFetch.map(async ({ run, job }) => {
+            const log = await fetchJobLogs(job.id);
+            return log ? parseEntryFromLog(log, env, run, job) : null;
         })
     );
 
     return results.filter((x): x is SatsHistoryEntry => x !== null);
 }
 
-/** Henter all satshistorikk for alle Q-miljøer */
-/** Henter og dedupliserer satshistorikk */
+// ─── Orkestrering og cache ───────────────────────────────────────────────────
+
+/** Sorterer nyest først og fjerner duplikater (samme satstabell innen 1 time) */
 function deduplicateAndSort(entries: SatsHistoryEntry[]): SatsHistoryEntry[] {
     entries.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-    // Dedupliser: om samme satstabell ble deployet flere ganger på kort tid, vis kun én entry
     return entries.filter((entry, i, arr) => {
         if (i === 0) return true;
         const prev = arr[i - 1];
-        if (entry.environment === prev.environment && entry.satstabell === prev.satstabell) {
-            const timeDiff = Math.abs(new Date(entry.timestamp).getTime() - new Date(prev.timestamp).getTime());
-            if (timeDiff < 3600000) return false;
-        }
-        return true;
+        if (entry.environment !== prev.environment || entry.satstabell !== prev.satstabell) return true;
+        const timeDiff = Math.abs(new Date(entry.timestamp).getTime() - new Date(prev.timestamp).getTime());
+        return timeDiff >= 3600000;
     });
 }
 
-/** Henter satshistorikk — perPage styrer antall runs per workflow */
-async function fetchSatsHistory(perPage: number): Promise<SatsHistoryEntry[]> {
+/** Henter historikk fra alle workflows parallelt */
+async function fetchHistory(perPage: number): Promise<SatsHistoryEntry[]> {
     const [sandbox, q1, q2, q5] = await Promise.all([
         fetchSandboxHistory(perPage).catch(() => []),
-        fetchStandaloneDeployHistory(WORKFLOW_IDS.deployQ1, 'q1', perPage).catch(() => []),
-        fetchStandaloneDeployHistory(WORKFLOW_IDS.deployQ2, 'q2', perPage).catch(() => []),
-        fetchStandaloneDeployHistory(WORKFLOW_IDS.deployQ5, 'q5', perPage).catch(() => []),
+        fetchStandaloneHistory(WORKFLOW_IDS.deployQ1, 'q1', perPage).catch(() => []),
+        fetchStandaloneHistory(WORKFLOW_IDS.deployQ2, 'q2', perPage).catch(() => []),
+        fetchStandaloneHistory(WORKFLOW_IDS.deployQ5, 'q5', perPage).catch(() => []),
     ]);
 
     return deduplicateAndSort([...sandbox, ...q1, ...q2, ...q5]);
 }
 
 /**
- * Smart cache: første gang hentes full historikk (150 runs).
- * Ved påfølgende kall (refresh) hentes kun 5 siste og merges med eksisterende data.
+ * Smart cache: første kall henter full historikk.
+ * Påfølgende kall henter kun de siste N runs og merger med eksisterende.
  */
 let cachedHistory: SatsHistoryEntry[] | null = null;
 
 export async function fetchAllSatsHistory(): Promise<SatsHistoryEntry[]> {
     if (cachedHistory === null) {
-        // Første innlasting — hent full historikk
-        cachedHistory = await fetchSatsHistory(RUNS_FULL_FETCH);
+        cachedHistory = await fetchHistory(RUNS_FULL_FETCH);
     } else {
-        // Påfølgende refresh — hent kun nye, merge med eksisterende
-        const recent = await fetchSatsHistory(RUNS_REFRESH_FETCH);
+        const recent = await fetchHistory(RUNS_REFRESH_FETCH);
         const existingIds = new Set(cachedHistory.map(e => `${e.runId}-${e.environment}`));
         const newEntries = recent.filter(e => !existingIds.has(`${e.runId}-${e.environment}`));
-        cachedHistory = deduplicateAndSort([...newEntries, ...cachedHistory]);
+        if (newEntries.length > 0) {
+            cachedHistory = deduplicateAndSort([...newEntries, ...cachedHistory]);
+        }
     }
     return cachedHistory;
 }
-
-// Stale etter 5 min — trigger refresh med kun 5 siste runs
-// GC etter 1 time — tømmer cache helt, neste besøk gjør full fetch
-const STALE_TIME = 5 * 60 * 1000;
-const GC_TIME = 60 * 60 * 1000;
-
-export const useSatsHistory = (): UseQueryResult<SatsHistoryEntry[], Error> =>
-    useQuery({
-        queryKey: ['satsHistory'],
-        queryFn: fetchAllSatsHistory,
-        staleTime: STALE_TIME,
-        gcTime: GC_TIME,
-        retry: 1,
-    });
