@@ -36,6 +36,5 @@ jobs:
           allow_ff: true
           allow_forks: true
           user_name: GitHub Merge Actions
-          push_token: ${{ steps.app-token.outputs.token }}
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
