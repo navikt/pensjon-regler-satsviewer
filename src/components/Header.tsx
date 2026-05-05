@@ -27,7 +27,7 @@ const Header: FC<HeaderProps> = ({ onChangedEnvironment, isProduction, showHisto
                     ← Tilbake
                 </Link>
             )}
-            {!isProduction && (
+            {!isProduction && !showBackLink && (
                 <Dropdown onSelect={(event: React.MouseEvent<Element, MouseEvent>) => onChangedEnvironment(event)}>
                     <InternalHeader.Button as={Dropdown.Toggle}>
                         Velg miljø

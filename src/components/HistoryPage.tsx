@@ -1,6 +1,7 @@
 import { FC, useMemo, useState } from 'react';
 import { Alert, BodyShort, Box, Heading, HStack, Loader, Link, Page, Select, Table, Tag } from "@navikt/ds-react";
-import { SatsHistoryEntry, useSatsHistory } from '../service/SatsHistoryService';
+import { SatsHistoryEntry } from '../service/SatsHistoryService';
+import { useSatsHistory } from '../service/useSatsHistory';
 import Header from './Header';
 import { isProduction } from '../utils/environment';
 import { useSearchParams } from 'react-router-dom';
