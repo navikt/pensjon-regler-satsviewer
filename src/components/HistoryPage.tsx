@@ -1,5 +1,5 @@
 import { FC, useMemo, useState } from 'react';
-import { Alert, Box, Heading, Loader, Page, Select, Table, Tag } from "@navikt/ds-react";
+import { Alert, BodyShort, Box, Heading, HStack, Loader, Link, Page, Select, Table, Tag } from "@navikt/ds-react";
 import { SatsHistoryEntry, useSatsHistory } from '../service/SatsHistoryService';
 import Header from './Header';
 import { isProduction } from '../utils/environment';
@@ -59,15 +59,15 @@ const HistoryPage: FC = () => {
                     <Heading size="large" spacing>Satshistorikk</Heading>
 
                     {currentSatsPerEnv.size > 0 && (
-                        <Box padding="space-16" paddingBlock="space-16" borderRadius="8" background="sunken">
+                        <Box padding="space-16" borderRadius="12" background="sunken">
                             <Heading size="small" spacing>Nåværende satstabell per miljø</Heading>
-                            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                            <HStack gap="space-16" wrap>
                                 {[...currentSatsPerEnv.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([env, entry]) => (
                                     <Tag key={env} variant={environmentColors[env] || 'neutral'} size="medium">
                                         {env.toUpperCase()}: {entry.satstabell}
                                     </Tag>
                                 ))}
-                            </div>
+                            </HStack>
                         </Box>
                     )}
 
@@ -88,7 +88,7 @@ const HistoryPage: FC = () => {
 
                     {isLoading && (
                         <Box padding="space-32" style={{ display: 'flex', justifyContent: 'center' }}>
-                            <Loader size="xlarge" title="Henter satshistorikk..." />
+                            <Loader size="xlarge" title="Henter satshistorikk…" />
                         </Box>
                     )}
 
@@ -100,13 +100,14 @@ const HistoryPage: FC = () => {
 
                     {filteredData.length > 0 && (
                         <Table size="small">
+                            <BodyShort as="caption" visuallyHidden>Historikk over satstabeller deployet til Q-miljøer</BodyShort>
                             <Table.Header>
                                 <Table.Row>
-                                    <Table.HeaderCell>Tidspunkt</Table.HeaderCell>
-                                    <Table.HeaderCell>Miljø</Table.HeaderCell>
-                                    <Table.HeaderCell>Satstabell</Table.HeaderCell>
-                                    <Table.HeaderCell>Versjon</Table.HeaderCell>
-                                    <Table.HeaderCell>Utført av</Table.HeaderCell>
+                                    <Table.HeaderCell scope="col">Tidspunkt</Table.HeaderCell>
+                                    <Table.HeaderCell scope="col">Miljø</Table.HeaderCell>
+                                    <Table.HeaderCell scope="col">Satstabell</Table.HeaderCell>
+                                    <Table.HeaderCell scope="col">Versjon</Table.HeaderCell>
+                                    <Table.HeaderCell scope="col">Utført av</Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
@@ -123,13 +124,12 @@ const HistoryPage: FC = () => {
                                         </Table.DataCell>
                                         <Table.DataCell style={{ fontFamily: 'monospace', fontSize: '0.85em' }}>
                                             {entry.runId > 0 ? (
-                                                <a
+                                                <Link
                                                     href={`https://github.com/navikt/pensjon-regler/actions/runs/${entry.runId}`}
                                                     target="_blank"
-                                                    rel="noopener noreferrer"
                                                 >
                                                     {entry.version.substring(0, 30)}
-                                                </a>
+                                                </Link>
                                             ) : (
                                                 entry.version
                                             )}
