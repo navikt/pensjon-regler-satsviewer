@@ -227,8 +227,8 @@ async function fetchSatsHistory(perPage: number): Promise<SatsHistoryEntry[]> {
 }
 
 /**
- * Smart cache: første gang hentes full historikk (100 runs).
- * Ved påfølgende kall (refresh) hentes kun 10 siste og merges med eksisterende data.
+ * Smart cache: første gang hentes full historikk (150 runs).
+ * Ved påfølgende kall (refresh) hentes kun 5 siste og merges med eksisterende data.
  */
 let cachedHistory: SatsHistoryEntry[] | null = null;
 
@@ -246,7 +246,7 @@ export async function fetchAllSatsHistory(): Promise<SatsHistoryEntry[]> {
     return cachedHistory;
 }
 
-// Stale etter 5 min — trigger refresh med kun 10 siste runs
+// Stale etter 5 min — trigger refresh med kun 5 siste runs
 // GC etter 1 time — tømmer cache helt, neste besøk gjør full fetch
 const STALE_TIME = 5 * 60 * 1000;
 const GC_TIME = 60 * 60 * 1000;
