@@ -46,8 +46,11 @@ interface WorkflowJobsResponse {
     jobs: WorkflowJob[];
 }
 
-// Antall workflow-runs å hente per workflow (mer = lengre historikk, men tregere)
-const RUNS_PER_WORKFLOW = 100;
+// Antall workflow-runs å hente per workflow ved første innlasting (full historikk)
+const RUNS_FULL_FETCH = 150;
+
+// Antall workflow-runs å hente ved oppdatering (kun sjekke om noe nytt har skjedd)
+const RUNS_REFRESH_FETCH = 5;
 
 const WORKFLOW_IDS = {
     sandbox: 200229765,
@@ -110,8 +113,8 @@ function parseVersion(logContent: string): string | null {
 }
 
 /** Henter alle Q-miljøer fra sandbox-workflowen i ett pass */
-async function fetchSandboxHistory(): Promise<SatsHistoryEntry[]> {
-    const runs = await fetchWorkflowRuns(WORKFLOW_IDS.sandbox, RUNS_PER_WORKFLOW);
+async function fetchSandboxHistory(perPage: number): Promise<SatsHistoryEntry[]> {
+    const runs = await fetchWorkflowRuns(WORKFLOW_IDS.sandbox, perPage);
 
     // Hent alle jobber parallelt
     const runsWithJobs = await Promise.all(
@@ -154,8 +157,8 @@ async function fetchSandboxHistory(): Promise<SatsHistoryEntry[]> {
 }
 
 /** Henter historikk fra en standalone deploy-workflow (deploy-q1, deploy-q2, deploy-q5) */
-async function fetchStandaloneDeployHistory(workflowId: number, env: string): Promise<SatsHistoryEntry[]> {
-    const runs = await fetchWorkflowRuns(workflowId, RUNS_PER_WORKFLOW);
+async function fetchStandaloneDeployHistory(workflowId: number, env: string, perPage: number): Promise<SatsHistoryEntry[]> {
+    const runs = await fetchWorkflowRuns(workflowId, perPage);
 
     // Hent alle jobber parallelt
     const runsWithJobs = await Promise.all(
@@ -195,19 +198,12 @@ async function fetchStandaloneDeployHistory(workflowId: number, env: string): Pr
 }
 
 /** Henter all satshistorikk for alle Q-miljøer */
-export async function fetchAllSatsHistory(): Promise<SatsHistoryEntry[]> {
-    const [sandbox, q1, q2, q5] = await Promise.all([
-        fetchSandboxHistory().catch(() => []),
-        fetchStandaloneDeployHistory(WORKFLOW_IDS.deployQ1, 'q1').catch(() => []),
-        fetchStandaloneDeployHistory(WORKFLOW_IDS.deployQ2, 'q2').catch(() => []),
-        fetchStandaloneDeployHistory(WORKFLOW_IDS.deployQ5, 'q5').catch(() => []),
-    ]);
-
-    const all = [...sandbox, ...q1, ...q2, ...q5];
-    all.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+/** Henter og dedupliserer satshistorikk */
+function deduplicateAndSort(entries: SatsHistoryEntry[]): SatsHistoryEntry[] {
+    entries.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
     // Dedupliser: om samme satstabell ble deployet flere ganger på kort tid, vis kun én entry
-    return all.filter((entry, i, arr) => {
+    return entries.filter((entry, i, arr) => {
         if (i === 0) return true;
         const prev = arr[i - 1];
         if (entry.environment === prev.environment && entry.satstabell === prev.satstabell) {
@@ -218,14 +214,48 @@ export async function fetchAllSatsHistory(): Promise<SatsHistoryEntry[]> {
     });
 }
 
-// Cache i 1 time — unngår unødvendige GitHub API-kall ved navigering/refresh
-const CACHE_TTL = 60 * 60 * 1000;
+/** Henter satshistorikk — perPage styrer antall runs per workflow */
+async function fetchSatsHistory(perPage: number): Promise<SatsHistoryEntry[]> {
+    const [sandbox, q1, q2, q5] = await Promise.all([
+        fetchSandboxHistory(perPage).catch(() => []),
+        fetchStandaloneDeployHistory(WORKFLOW_IDS.deployQ1, 'q1', perPage).catch(() => []),
+        fetchStandaloneDeployHistory(WORKFLOW_IDS.deployQ2, 'q2', perPage).catch(() => []),
+        fetchStandaloneDeployHistory(WORKFLOW_IDS.deployQ5, 'q5', perPage).catch(() => []),
+    ]);
+
+    return deduplicateAndSort([...sandbox, ...q1, ...q2, ...q5]);
+}
+
+/**
+ * Smart cache: første gang hentes full historikk (100 runs).
+ * Ved påfølgende kall (refresh) hentes kun 10 siste og merges med eksisterende data.
+ */
+let cachedHistory: SatsHistoryEntry[] | null = null;
+
+export async function fetchAllSatsHistory(): Promise<SatsHistoryEntry[]> {
+    if (cachedHistory === null) {
+        // Første innlasting — hent full historikk
+        cachedHistory = await fetchSatsHistory(RUNS_FULL_FETCH);
+    } else {
+        // Påfølgende refresh — hent kun nye, merge med eksisterende
+        const recent = await fetchSatsHistory(RUNS_REFRESH_FETCH);
+        const existingIds = new Set(cachedHistory.map(e => `${e.runId}-${e.environment}`));
+        const newEntries = recent.filter(e => !existingIds.has(`${e.runId}-${e.environment}`));
+        cachedHistory = deduplicateAndSort([...newEntries, ...cachedHistory]);
+    }
+    return cachedHistory;
+}
+
+// Stale etter 5 min — trigger refresh med kun 10 siste runs
+// GC etter 1 time — tømmer cache helt, neste besøk gjør full fetch
+const STALE_TIME = 5 * 60 * 1000;
+const GC_TIME = 60 * 60 * 1000;
 
 export const useSatsHistory = (): UseQueryResult<SatsHistoryEntry[], Error> =>
     useQuery({
         queryKey: ['satsHistory'],
         queryFn: fetchAllSatsHistory,
-        staleTime: CACHE_TTL,
-        gcTime: CACHE_TTL,
+        staleTime: STALE_TIME,
+        gcTime: GC_TIME,
         retry: 1,
     });
