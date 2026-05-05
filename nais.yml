@@ -31,8 +31,6 @@ spec:
   env:
     - name: GITHUB_APP_ID
       value: "{{ github_app_id }}"
-    - name: GITHUB_APP_INSTALLATION_ID
-      value: "{{ github_app_installation_id }}"
     - name: GITHUB_APP_PRIVATE_KEY
       value: "{{ github_app_private_key }}"
   accessPolicy:

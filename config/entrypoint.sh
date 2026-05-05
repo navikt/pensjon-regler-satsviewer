@@ -2,7 +2,6 @@
 set -e
 
 APP_ID="${GITHUB_APP_ID}"
-INSTALLATION_ID="${GITHUB_APP_INSTALLATION_ID}"
 PEM_PATH="/tmp/github-app-key.pem"
 
 log() {
@@ -14,8 +13,8 @@ if [ -z "$GITHUB_APP_PRIVATE_KEY" ]; then
   exec nginx -g 'daemon off;'
 fi
 
-if [ -z "$APP_ID" ] || [ -z "$INSTALLATION_ID" ]; then
-  log "WARNING: GITHUB_APP_ID eller GITHUB_APP_INSTALLATION_ID mangler — starter uten GitHub-token"
+if [ -z "$APP_ID" ]; then
+  log "WARNING: GITHUB_APP_ID mangler — starter uten GitHub-token"
   exec nginx -g 'daemon off;'
 fi
 
@@ -36,9 +35,21 @@ generate_jwt() {
   printf '%s.%s.%s' "$HEADER" "$PAYLOAD" "$SIGNATURE"
 }
 
-# Bytt JWT mot installation access token
+# Hent installation ID og bytt JWT mot access token
 get_token() {
   JWT=$(generate_jwt)
+
+  INSTALLATION_ID=$(curl -sf \
+    -H "Authorization: Bearer $JWT" \
+    -H "Accept: application/vnd.github.v3+json" \
+    https://api.github.com/app/installations \
+    | sed -n 's/.*"id": *\([0-9]*\).*/\1/p' | head -1)
+
+  if [ -z "$INSTALLATION_ID" ]; then
+    log "ERROR: Klarte ikke hente installation ID"
+    return 1
+  fi
+
   TOKEN=$(curl -sf -X POST \
     -H "Authorization: Bearer $JWT" \
     -H "Accept: application/vnd.github.v3+json" \
