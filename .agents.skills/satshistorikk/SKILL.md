@@ -88,8 +88,8 @@ Nginx proxyer `/github-api/*` til `api.github.com` med `Authorization: Bearer <t
 
 Disse ligger øverst i `SatsHistoryService.ts`:
 
-- `RUNS_FULL_FETCH` — Antall runs ved første innlasting (default: 100, max: 100 per GitHub API page)
-- `RUNS_REFRESH_FETCH` — Antall runs ved refresh (default: 10)
+- `RUNS_FULL_FETCH` — Antall runs ved første innlasting (default: 150, max: 100 per GitHub API page)
+- `RUNS_REFRESH_FETCH` — Antall runs ved refresh (default: 5)
 - `STALE_TIME` — Tid før react-query anser data som stale (default: 5 min)
 - `GC_TIME` — Tid før cache garbage-collectes (default: 1 time)
 
