@@ -10,9 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@navikt/ds-css": "^8.10.2",
+    "@navikt/ds-css": "^8.10.3",
     "@navikt/ds-react": "^8.10.2",
-    "@tanstack/react-query": "^5.100.5",
+    "@tanstack/react-query": "^5.100.6",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-error-boundary": "^6.1.1",
