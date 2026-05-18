@@ -1,16 +1,16 @@
-import { useEffect, FC } from 'react';
-import { Box, Heading, Loader } from '@navikt/ds-react';
-import { fetchAktivSatsTabellByMiljø } from '../service/Queries';
-import { useQuery, UseQueryResult } from '@tanstack/react-query';
+import {FC, useEffect} from 'react';
+import {Box, Heading, Loader} from '@navikt/ds-react';
+import {fetchAktivSatsTabellByMiljø} from '../service/Queries';
+import {useQuery, UseQueryResult} from '@tanstack/react-query';
 
 interface AktivTabellKontrollerProps {
     environment: string;
     onSatsChange: (data: string) => void;
 }
 
-const AktivTabellKontroller: FC<AktivTabellKontrollerProps> = ({ environment, onSatsChange }) => {
+const AktivTabellKontroller: FC<AktivTabellKontrollerProps> = ({environment, onSatsChange}) => {
 
-    const { data, isError, isLoading, isSuccess }: UseQueryResult<string, unknown> = useQuery({
+    const {data, isError, isLoading, isSuccess}: UseQueryResult<string, unknown> = useQuery({
         queryKey: ['environment', environment],
         queryFn: () => fetchAktivSatsTabellByMiljø(environment),
         throwOnError: true,
@@ -28,7 +28,7 @@ const AktivTabellKontroller: FC<AktivTabellKontrollerProps> = ({ environment, on
     }
 
     if (isLoading) {
-        return <Loader size="3xlarge" title="Laster ..." />
+        return <Loader size="3xlarge" title="Laster ..."/>
     }
 
     return (
