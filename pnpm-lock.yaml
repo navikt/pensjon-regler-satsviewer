@@ -12,8 +12,8 @@ importers:
         specifier: ^8.10.5
         version: 8.10.5
       '@navikt/ds-react':
-        specifier: ^8.10.4
-        version: 8.10.4(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: ^8.10.5
+        version: 8.10.5(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@tanstack/react-query':
         specifier: ^5.100.9
         version: 5.100.9(react@19.2.6)
@@ -370,8 +370,8 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
 
-  '@floating-ui/react@0.27.8':
-    resolution: {integrity: sha512-EQJ4Th328y2wyHR3KzOUOoTW2UKjFk53fmyahfwExnFQ8vnsMYqKc+fFPOkeYtj5tcp1DUMiNJ7BFhed7e9ONw==}
+  '@floating-ui/react@0.27.19':
+    resolution: {integrity: sha512-31B8h5mm8YxotlE7/AU/PhNAl8eWxAmjL/v2QOxroDNkTFLk3Uu82u63N3b6TXa4EGJeeZLVcd/9AlNlVqzeog==}
     peerDependencies:
       react: '>=17.0.0'
       react-dom: '>=17.0.0'
@@ -423,8 +423,8 @@ packages:
   '@navikt/ds-css@8.10.5':
     resolution: {integrity: sha512-XJXHPyN0IPQV/zMSVw06uJsqrSyOObgJ7PiQ9wSkw5bLfwv8ksn51HV3EkRXy7h0A8EHnlywFvgROwMVIBqHoA==, tarball: https://npm.pkg.github.com/download/@navikt/ds-css/8.10.5/55b51c6fdb86d5123b4b18265f53dc67eb26e6f7}
 
-  '@navikt/ds-react@8.10.4':
-    resolution: {integrity: sha512-a6p8x9W31cG2SiOLzireG8iVCUMB/8YrnOnTOPv/IRmaafAwRgPrhUYaMsboMvgpF1LNAMCidIo78uIj+YZMPg==, tarball: https://npm.pkg.github.com/download/@navikt/ds-react/8.10.4/83b5d10fccab9822fc84db5e1bd77211f4228100}
+  '@navikt/ds-react@8.10.5':
+    resolution: {integrity: sha512-6gkdSoeLYuLb0Ko7uUuPJHqZCMJtDbPiltFoVXReTMvAIQjd4TdeWXhD5EB2I31ia/cCBJC5t8b6v9n4/mSG6A==, tarball: https://npm.pkg.github.com/download/@navikt/ds-react/8.10.5/2390636a2fce5620e48d5bf1b5506eb1e573935c}
     peerDependencies:
       '@types/react': ^17.0.30 || ^18 || ^19
       react: ^17 || ^18 || ^19
@@ -1596,7 +1596,7 @@ snapshots:
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
 
-  '@floating-ui/react@0.27.8(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+  '@floating-ui/react@0.27.19(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
     dependencies:
       '@floating-ui/react-dom': 2.1.8(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@floating-ui/utils': 0.2.11
@@ -1647,9 +1647,9 @@ snapshots:
 
   '@navikt/ds-css@8.10.5': {}
 
-  '@navikt/ds-react@8.10.4(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+  '@navikt/ds-react@8.10.5(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
     dependencies:
-      '@floating-ui/react': 0.27.8(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@floating-ui/react': 0.27.19(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@floating-ui/react-dom': 2.1.8(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@navikt/aksel-icons': 8.10.5
       '@navikt/ds-tokens': 8.10.5
