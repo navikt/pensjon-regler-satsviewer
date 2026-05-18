@@ -58,14 +58,22 @@ I tillegg holder vi en modul-level `cachedHistory`-variabel som skiller mellom "
 
 GitHub App: "pensjon-regler-tokens" (app_id: 2705960, installation_id: 105505840).
 
-Flyten:
-1. `entrypoint.sh` dekoder PEM-nøkkel (base64-kodet i NAIS-variabel)
-2. Genererer JWT med openssl
-3. Bytter JWT mot installation access token
-4. Injiserer token i nginx-config
-5. Refresher token hvert 50. minutt (token lever i 1 time)
+### Hvorfor nginx-proxy?
 
-Nginx proxyer `/github-api/*` til `api.github.com` med `Authorization: Bearer <token>`.
+Frontenden (nettleseren) kan ikke kalle GitHub API direkte fordi:
+- **CORS**: GitHub blokkerer forespørsler fra andre domener
+- **Sikkerhet**: Tokenet kan ikke eksponeres i nettleseren
+
+Derfor proxyer nginx alle `/github-api/*`-kall til `api.github.com` og legger på
+`Authorization`-headeren automatisk. Nettleseren ser aldri tokenet.
+
+### Token-flyten
+
+1. `entrypoint.sh` dekoder PEM-nøkkel (base64-kodet pga NAIS VAR-format)
+2. Genererer JWT med openssl (RS256-signert)
+3. Bytter JWT mot installation access token via GitHub API
+4. `sed`-er tokenet inn i nginx-konfig (erstatter placeholder)
+5. Refresher token hvert 50. minutt (token utløper etter 1 time)
 
 ## Viktige begrensninger
 
