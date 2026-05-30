@@ -12,8 +12,8 @@ importers:
         specifier: ^8.11.0
         version: 8.11.0
       '@navikt/ds-react':
-        specifier: ^8.10.6
-        version: 8.10.6(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: ^8.11.0
+        version: 8.11.0(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@tanstack/react-query':
         specifier: ^5.100.11
         version: 5.100.11(react@19.2.6)
@@ -407,8 +407,8 @@ packages:
   '@navikt/ds-css@8.11.0':
     resolution: {integrity: sha512-UxPVWtZC9JW1vho0JFdxh9XmQpiKVQgM2+HhE5st5h8W5AUKOgzrSUkSjQQNEdeAg1RhWhJ2Jwu3W2rC4VZS1Q==, tarball: https://npm.pkg.github.com/download/@navikt/ds-css/8.11.0/888861af213f1f01d1becab42fe59810b6dba2be}
 
-  '@navikt/ds-react@8.10.6':
-    resolution: {integrity: sha512-XfuMhct9i6no6soZnvmzzn9CuqUDmk6FBQg0aNiKEpAkZUyp8l9AX1Hq2EQld3QTUEN9ldZDmoP8jBmtz7Kl3g==, tarball: https://npm.pkg.github.com/download/@navikt/ds-react/8.10.6/6b1f5751a41ab6025ac61a8375e9c59f8add65d7}
+  '@navikt/ds-react@8.11.0':
+    resolution: {integrity: sha512-wZa5qIsQx/LWvjNGYuutR4oHZAjhA5pVxEyAIIo8HOmSXwTgcPhZItBjeDYYM53RmrctLd/NcovB8LjIoCwgcA==, tarball: https://npm.pkg.github.com/download/@navikt/ds-react/8.11.0/3d9c8daf43639aa8b37b321280a74201eb15b6f9}
     peerDependencies:
       '@types/react': ^17.0.30 || ^18 || ^19
       react: ^17 || ^18 || ^19
@@ -1515,7 +1515,7 @@ snapshots:
 
   '@navikt/ds-css@8.11.0': {}
 
-  '@navikt/ds-react@8.10.6(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+  '@navikt/ds-react@8.11.0(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
     dependencies:
       '@floating-ui/react': 0.27.19(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@floating-ui/react-dom': 2.1.8(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
