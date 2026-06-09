@@ -15,7 +15,7 @@ jobs:
       actions: read
       id-token: write
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v6.0.3
       - name: Encode GitHub App private key
         id: encode-key
         run: echo "ENCODED_KEY=$(echo '${{ secrets.APP_PRIVATE_KEY }}' | base64 -w 0)" >> $GITHUB_OUTPUT
