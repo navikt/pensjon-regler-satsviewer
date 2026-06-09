@@ -4,6 +4,7 @@ on:
     branches:
       - main
   workflow_run:
+    workflow_dispatch:
     workflows: ['Automerge Dependabot']
     types:
       - completed
