@@ -13,14 +13,14 @@
     "@navikt/ds-css": "^8.11.1",
     "@navikt/ds-react": "^8.11.1",
     "@tanstack/react-query": "^5.100.14",
-    "react": "^19.2.6",
+    "react": "^19.2.7",
     "react-dom": "^19.2.6",
     "react-error-boundary": "^6.1.2",
     "react-router-dom": "^7.16.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
-    "@types/react": "^19.2.15",
+    "@types/react": "^19.2.16",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
     "eslint": "^10.4.1",
