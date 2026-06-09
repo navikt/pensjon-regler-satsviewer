@@ -6,7 +6,7 @@ ENV COREPACK_HOME="/app/.corepack"
 ENV PATH="/app/.pnpm:$PATH"
 RUN mkdir -p /app/.pnpm /app/.corepack && \
     corepack enable --install-directory /app/.pnpm && \
-    corepack prepare pnpm@latest --activate
+    corepack prepare pnpm@10.32.1 --activate
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig*.json vite.config.ts .npmrc ./
 RUN --mount=type=secret,id=NODE_AUTH_TOKEN \
     npm config set //npm.pkg.github.com/:_authToken "$(cat /run/secrets/NODE_AUTH_TOKEN)" && \
