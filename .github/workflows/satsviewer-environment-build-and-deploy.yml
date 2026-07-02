@@ -27,7 +27,7 @@ jobs:
           echo "Debug - Generated tag value:"
           cat $GITHUB_OUTPUT
       - name: Build and push image and SBOM to OCI registry
-        uses: nais/docker-build-push@v0
+        uses: nais/docker-build-push@31c3a7321909bcb20799fdf46153fec721fd9512 # v0 @ 2026-07-01
         id: docker-build-push
         with:
           team: pensjon-regler
@@ -37,7 +37,8 @@ jobs:
         id: replace-tag
         run: |
           original_image="${{ steps.docker-build-push.outputs.image }}"
-          new_image="${original_image%:*}:${{ steps.tag.outputs.TAG }}"
+          image_without_digest="${original_image%@*}"
+          new_image="${image_without_digest%:*}:${{ steps.tag.outputs.TAG }}"
           echo "IMAGE=${new_image}" >> $GITHUB_OUTPUT
       - name: Encode GitHub App private key
         id: encode-key
