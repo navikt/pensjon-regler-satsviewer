@@ -16,6 +16,8 @@ import BarnetilleggTak2016Tabell from './satstabeller/BarnetilleggTak2016Tabell'
 import NordiskKonvensjonslandTabell from './satstabeller/NordiskKonvensjonslandTabell';
 import EØSKonvensjonslandTabell from './satstabeller/EØSKonvensjonslandTabell';
 import ReferansebeløpAfpTabell from './satstabeller/ReferansebeløpAfpTabell';
+import ForholdstallTabell from './satstabeller/ForholdstallTabell';
+import DelingstallTabell from './satstabeller/DelingstallTabell';
 import {ErrorBoundary, FallbackProps} from 'react-error-boundary';
 import {environments} from '../constants/Constants';
 import {isProduction, PROD_ENVIRONMENT} from '../utils/environment';
@@ -112,6 +114,15 @@ const AppPage: FC = () => {
                                     </Accordion.Header>
                                     <Accordion.Content>
                                         <ReferansebeløpAfpTabell environment={environment} satstabell={sats}/>
+                                    </Accordion.Content>
+                                </Accordion.Item>
+                                <Accordion.Item>
+                                    <Accordion.Header>
+                                        Forholdstall og delingstall
+                                    </Accordion.Header>
+                                    <Accordion.Content>
+                                        <ForholdstallTabell environment={environment} satstabell={sats}/>
+                                        <DelingstallTabell environment={environment} satstabell={sats}/>
                                     </Accordion.Content>
                                 </Accordion.Item>
                             </Accordion>

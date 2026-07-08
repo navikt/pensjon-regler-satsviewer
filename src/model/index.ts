@@ -133,6 +133,17 @@ export interface ReferansebeløpAfpSatser {
     satser: ReferansebeløpAfpSats[];
 }
 
+export interface TallEntry {
+    arskull: number;
+    alder: number;
+    måned: number;
+    verdi: number;
+}
+
+export interface TallSatser {
+    satser: TallEntry[];
+}
+
 export type SatserType =
     | GrunnbelopSatser
     | VeietGrunnbelopSatser
@@ -148,7 +159,8 @@ export type SatserType =
     | BarnetilleggTak2016Satser
     | NordiskKonvensjonsLandSatser
     | EosKonvensjonsLandSatser
-    | ReferansebeløpAfpSatser;
+    | ReferansebeløpAfpSatser
+    | TallSatser;
 
 export interface Satser {
     satser: string[];
