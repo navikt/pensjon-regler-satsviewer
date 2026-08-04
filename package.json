@@ -14,8 +14,8 @@
     "@navikt/ds-css": "^8.15.0",
     "@navikt/ds-react": "^8.15.0",
     "@tanstack/react-query": "^5.101.2",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "react-error-boundary": "^6.1.2",
     "react-router-dom": "^7.18.1"
   },
