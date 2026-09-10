@@ -12,8 +12,8 @@ importers:
         specifier: ^8.16.2
         version: 8.16.2
       '@navikt/ds-react':
-        specifier: ^8.16.1
-        version: 8.16.1(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: ^8.16.2
+        version: 8.16.2(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@tanstack/react-query':
         specifier: ^5.102.8
         version: 5.102.8(react@19.2.8)
@@ -386,21 +386,21 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@navikt/aksel-icons@8.16.1':
-    resolution: {integrity: sha512-qrvaYi2tr2hClZXGnVMR+kgd3ruV5bPDIVz8dlQqkZ8RNA6Rd14HXZ0pQUvxyvAWS/NxdjaYAO3Cl1MpFRilAA==, tarball: https://npm.pkg.github.com/download/@navikt/aksel-icons/8.16.1/14a6bd35401f4ab289af18de58f94399d621ebf7}
+  '@navikt/aksel-icons@8.16.2':
+    resolution: {integrity: sha512-d2GWooeIEJYq8NYJIJJhMo84Vac6SyCvLJDFWG6RSj8vcgFanQMnKAram1zd48UO/rjuuZZk99p4UZt4jsD0RA==, tarball: https://npm.pkg.github.com/download/@navikt/aksel-icons/8.16.2/8873ba72cb6d59c80e864fb04cf43ca0731dbfa5}
 
   '@navikt/ds-css@8.16.2':
     resolution: {integrity: sha512-RMKKQ1OTXGPwSGPsWEvOXpRTxA+QhnHc4oGG0ePg7AeeGQvYE/VjtySL2ddOYwAR8BygyvuB/sDrjm5AkQQ0cw==, tarball: https://npm.pkg.github.com/download/@navikt/ds-css/8.16.2/a132ee47c528af289b89dd5d806ac1abfc937e44}
 
-  '@navikt/ds-react@8.16.1':
-    resolution: {integrity: sha512-JU6k3dtjwTTWKR9FYKtBYCXRXvyt6WkVaAoOR0l8E9TjbvxdfUlgpcOZALe59OKDL6WnpGk2ZrfEf1CPohyyMw==, tarball: https://npm.pkg.github.com/download/@navikt/ds-react/8.16.1/6534446031f78476a07862f1026ad61e3e392903}
+  '@navikt/ds-react@8.16.2':
+    resolution: {integrity: sha512-pJGVltBJT5hNwo+fZee5qaM+Kc+hZZgPU7WoXbUbZxUtTbhHM+5uFo4J5ceMU2KBUhamtqtRGso2dXdztyEiHQ==, tarball: https://npm.pkg.github.com/download/@navikt/ds-react/8.16.2/212af8009cab85a672faa15f0a039eaabec9cbc7}
     peerDependencies:
       '@types/react': ^17.0.30 || ^18 || ^19
       react: ^17 || ^18 || ^19
       react-dom: ^17 || ^18 || ^19
 
-  '@navikt/ds-tokens@8.16.1':
-    resolution: {integrity: sha512-PTLN5EWkfprObW3sJfRqcZvYOTMpG2l92VrMYeVX272hPlKn7an9eodZ6ggIMTEeNoQ+MuOhN0wEVk6Cbs77SA==, tarball: https://npm.pkg.github.com/download/@navikt/ds-tokens/8.16.1/f1ac550ff75679021d1c3a21997f33a9728a6a01}
+  '@navikt/ds-tokens@8.16.2':
+    resolution: {integrity: sha512-WXtLRb034uUN1SUBEg+AYUrAu0zm+P0xuUheIWABEDpWnVGmfXDng7lIW5JDFbut3rQIa1xfzvUfeL3ghc4eng==, tarball: https://npm.pkg.github.com/download/@navikt/ds-tokens/8.16.2/a22ed996203e7730664ed43d7025c68609c937a8}
 
   '@oxc-project/types@0.146.0':
     resolution: {integrity: sha512-XC0QsnnhVe7sLIWmYmdPw7x5P0h4W8vUU3Nv1ySgWXtvCz8NizoAEpGXA0sOYoJQV2Rl13LgURAHQ5cI5ILCSA==}
@@ -1486,23 +1486,23 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@navikt/aksel-icons@8.16.1': {}
+  '@navikt/aksel-icons@8.16.2': {}
 
   '@navikt/ds-css@8.16.2': {}
 
-  '@navikt/ds-react@8.16.1(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@navikt/ds-react@8.16.2(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@floating-ui/react': 0.27.20(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@floating-ui/react-dom': 2.1.9(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@navikt/aksel-icons': 8.16.1
-      '@navikt/ds-tokens': 8.16.1
+      '@navikt/aksel-icons': 8.16.2
+      '@navikt/ds-tokens': 8.16.2
       '@types/react': 19.2.18
       date-fns: 4.4.0
       react: 19.2.8
       react-day-picker: 10.0.1(@types/react@19.2.18)(react@19.2.8)
       react-dom: 19.2.8(react@19.2.8)
 
-  '@navikt/ds-tokens@8.16.1': {}
+  '@navikt/ds-tokens@8.16.2': {}
 
   '@oxc-project/types@0.146.0': {}
 
