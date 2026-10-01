@@ -44,7 +44,7 @@ jobs:
         id: encode-key
         run: echo "ENCODED_KEY=$(echo '${{ secrets.APP_PRIVATE_KEY }}' | base64 -w 0)" >> $GITHUB_OUTPUT
       - name: Deploy to Nais
-        uses: nais/deploy/actions/deploy@v2
+        uses: nais/deploy/actions/deploy@v3
         env:
           TZ: Europe/Oslo
           CLUSTER: dev-gcp
