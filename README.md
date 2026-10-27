@@ -31,9 +31,19 @@ eller noe annet om spesifisert.
 Under satstabell-kategori komponentene ligger de respektive satstabellene.
 
 ## Bygg & Deploy
-Ved push til main branchen vil det automatisk settes i gang bygg & deploy jobber både til  
-dev-gcp og prod-gcp.  
+Ved push til `main` bygges og deployes appen til prod-gcp. Endringene merges også til
+`sandbox`, der push utløser bygg og deploy til dev-gcp.
 Workflow-filene ligger under `<repo-root>/.github/workflows`
+
+`nais/docker-build-push` henter ferske baseimages ved hvert bygg. Oppdateringer fra
+Chainguard tas i bruk neste gang appen bygges og deployes. Det er ikke satt opp
+tidsstyrte bygg eller deployer.
+
+Runtime bruker `cgr.dev/chainguard/nginx:latest-dev` fordi `entrypoint.sh` trenger shell,
+OpenSSL og curl for GitHub App-autentisering. Den ubrukte GNU wget-pakken fjernes.
+OpenSSL og glibc beholdes som nødvendige runtime-avhengigheter; funn uten tilgjengelig
+rettelse må følges opp hos Chainguard, ikke automatisk undertrykkes.
+Se [Navs veiledning for Chainguard-images](https://sikkerhet.nav.no/docs/verktoy/chainguard-dockerimages/).
 
 ## Intern Informasjonsflyt
 
@@ -67,4 +77,3 @@ Secrets som trengs i dette repoet:
 Dersom det lages en ny satstabell må denne eksponeres via et nytt endepunkt i  
 komponenten `HentSatsController` fra pensjon-regler. 
 Deretter må det lages en ny tabell i Satsviewer på samme måte som andre tabeller er blitt laget i `src/components/satstabeller/`.
-
