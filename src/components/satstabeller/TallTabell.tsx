@@ -1,6 +1,6 @@
 import {FC, useEffect, useMemo, useState} from "react";
 import {Accordion, BodyShort, Detail, Loader, Select, Table, UNSAFE_Combobox} from "@navikt/ds-react";
-import {querySatsTabellByMiljøAndType} from "../../service/Queries";
+import {useSatsTabellByMiljøAndType} from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
 import {useQueryClient, UseQueryResult} from "@tanstack/react-query";
 import {TallEntry, TallSatser} from "../../model";
@@ -75,7 +75,7 @@ const TallTabell: FC<TallTabellProps> = ({environment, satstabell, type, tittel}
         isLoading,
         isSuccess,
         isFetching,
-    } = querySatsTabellByMiljøAndType(environment, type, satstabell) as UseQueryResult<TallSatser>;
+    } = useSatsTabellByMiljøAndType(environment, type, satstabell) as UseQueryResult<TallSatser>;
 
     const alleRader = useMemo(() => data?.satser ?? [], [data]);
 
