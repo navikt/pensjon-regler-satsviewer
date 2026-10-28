@@ -53,7 +53,7 @@ export const fetchAlleSatstabellerByMiljø = async (environment: string): Promis
 
 }
 
-export const querySatsTabellByMiljøAndType = (environment: string, type: string, satsTabell: string): UseQueryResult<SatserType, unknown> => useQuery({
+export const useSatsTabellByMiljøAndType = (environment: string, type: string, satsTabell: string): UseQueryResult<SatserType, unknown> => useQuery({
     queryKey: ['satsTabell', environment, type, satsTabell],
     queryFn: () => fetchSatsByTabellByMiljøAndType(environment, type, satsTabell),
     throwOnError: true,
