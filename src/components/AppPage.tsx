@@ -38,8 +38,9 @@ const AppPage: FC = () => {
     const [environment, setEnvironment] = useState<string>(isProd ? PROD_ENVIRONMENT : environments[2]);
 
     const onChangedEnvironment = (event: React.MouseEvent<Element, MouseEvent>) => {
-        // @ts-ignore
-        setEnvironment(event && event.target ? event.target.innerText : undefined)
+        if (event?.target instanceof HTMLElement) {
+            setEnvironment(event.target.innerText)
+        }
     }
 
     const onSatsChange = (sats: string) => {

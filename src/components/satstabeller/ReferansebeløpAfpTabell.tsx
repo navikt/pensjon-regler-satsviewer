@@ -1,7 +1,7 @@
 import { useEffect, FC } from "react";
 import { Accordion, Loader, Table } from "@navikt/ds-react";
 import { referansebeløpAfpSats } from "../../constants/Constants";
-import { querySatsTabellByMiljøAndType } from "../../service/Queries";
+import { useSatsTabellByMiljøAndType } from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
 import { useQueryClient, UseQueryResult } from "@tanstack/react-query";
 import { ReferansebeløpAfpSats, ReferansebeløpAfpSatser } from "../../model";
@@ -18,9 +18,9 @@ const ReferansebeløpAfpTabell: FC<ReferansebeløpAfpTabellProps> = ({ environme
 
     useEffect(() => {
         queryClient.invalidateQueries({ queryKey: ['satsTabell'] });
-    }, [satstabell]);
+    }, [satstabell, queryClient]);
 
-    const { data, isError, isLoading, isSuccess, isFetching } = querySatsTabellByMiljøAndType(environment, type, satstabell) as UseQueryResult<ReferansebeløpAfpSatser>;
+    const { data, isError, isLoading, isSuccess, isFetching } = useSatsTabellByMiljøAndType(environment, type, satstabell) as UseQueryResult<ReferansebeløpAfpSatser>;
 
     if (isError) {
         throw new Error(`Det oppstod en feil ved henting av satsTabell mot miljø ${environment}.`);

@@ -1,7 +1,7 @@
 import {FC, useEffect} from "react";
 import {Accordion, Loader, Table} from "@navikt/ds-react";
 import {grunnbeløpSats} from "../../constants/Constants";
-import {querySatsTabellByMiljøAndType} from "../../service/Queries";
+import {useSatsTabellByMiljøAndType} from "../../service/Queries";
 import DefaultTable from "../DefaultTable";
 import {useQueryClient, UseQueryResult} from '@tanstack/react-query';
 import {GrunnpensjonSatser, Sats} from "../../model";
@@ -17,7 +17,7 @@ const GrunnbeløpTabell: FC<GrunnbeløpTabellProps> = ({environment, satstabell}
 
     useEffect(() => {
         queryClient.invalidateQueries({queryKey: ['satsTabell']});
-    }, [satstabell]);
+    }, [satstabell, queryClient]);
 
     const {
         data,
@@ -25,7 +25,7 @@ const GrunnbeløpTabell: FC<GrunnbeløpTabellProps> = ({environment, satstabell}
         isLoading,
         isSuccess,
         isFetching
-    } = querySatsTabellByMiljøAndType(environment, type, satstabell) as UseQueryResult<GrunnpensjonSatser>;
+    } = useSatsTabellByMiljøAndType(environment, type, satstabell) as UseQueryResult<GrunnpensjonSatser>;
 
     if (isError) {
         throw new Error(`Det oppstod en feil ved henting av satsTabell mot miljø ${environment}.`);
