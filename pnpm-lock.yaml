@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@navikt/ds-css':
-        specifier: ^8.20.1
-        version: 8.20.1
+        specifier: ^8.21.0
+        version: 8.21.0
       '@navikt/ds-react':
         specifier: ^8.21.0
         version: 8.21.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -40,8 +40,8 @@ importers:
         specifier: ^19.3.0
         version: 19.3.0(@types/react@19.3.0)
       '@vitejs/plugin-react':
-        specifier: ^6.1.2
-        version: 6.1.2(vite@8.3.5(esbuild@0.28.2))
+        specifier: ^6.2.1
+        version: 6.2.1(vite@8.3.5(esbuild@0.28.2))
       esbuild:
         specifier: ^0.28.2
         version: 0.28.2
@@ -429,8 +429,8 @@ packages:
   '@navikt/aksel-icons@8.21.0':
     resolution: {integrity: sha512-/RXiUI1dt4lt/prvz2ngVp7BryHzLFIpq0wW1cjMKxqaaJwE4eYvTDFAdAFUpu3dL4hNRaXsji1GOxGGAK/jqw==, tarball: https://npm.pkg.github.com/download/@navikt/aksel-icons/8.21.0/3732daf4de6b0b26ae40aa42c2ad832b6acccc62}
 
-  '@navikt/ds-css@8.20.1':
-    resolution: {integrity: sha512-qEv4FIv9OI9B7hCEk8wSjU7Z37ZxrVmO6IcITn2OijAKXXg3GVxHva74LBk84T84nX1Tt1S7TTrY3GGudoEE7A==, tarball: https://npm.pkg.github.com/download/@navikt/ds-css/8.20.1/94247803f073d5b89dc4492eaad35693eb4c3790}
+  '@navikt/ds-css@8.21.0':
+    resolution: {integrity: sha512-AaQZAH6Q7lmYpTByyyaynW8iKE5cHUjo/f3ed1ec0D7hxVP4Ywe/VEiin2EAIZrvgtoIDPkZnBshXJXZDmtiGg==, tarball: https://npm.pkg.github.com/download/@navikt/ds-css/8.21.0/6eb5e54586619b14d42a8dd9df8f95268d688adc}
 
   '@navikt/ds-react@8.21.0':
     resolution: {integrity: sha512-1AL7iE/iPlUTLPkBmQVNrutk7FuaO1A9NEjpD5xyiV/JLVZ8pHnqU4QQWqkzG01nOgi7IJpdjpDgCNGtH44JZg==, tarball: https://npm.pkg.github.com/download/@navikt/ds-react/8.21.0/4584f43909971b8c8957c655068ffa954e4dcfdd}
@@ -632,13 +632,13 @@ packages:
     resolution: {integrity: sha512-SB8xqipSzZHUePCCLNeYxqnxq83X61/qzNhjQGbTfjxGZIeOEP7tBgWYX05Tcd6CgE02WdTJnh5b8kMZJ/+bnQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@vitejs/plugin-react@6.1.2':
-    resolution: {integrity: sha512-fhJNGUdscQa4HkI0xFxwonWyhnVReCPDbXI7FH7jmzpnVCrFQI7PRrhWecO263610vOrs9tr2Y4xcf8uAdFxbw==}
+  '@vitejs/plugin-react@6.2.1':
+    resolution: {integrity: sha512-9KyWCij3r0+qLG3Q62vBmv0VyevmYibAtxaCIVK9o0k6CXgaajZRIe8tpfchQcdZArJ5b/7OrIz4W3b2uxVRDA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
-      '@rolldown/plugin-babel': ^0.1.7 || ^0.2.0
+      '@rolldown/plugin-babel': ^0.1.7 || ^0.2.0 || ^0.3.0
       babel-plugin-react-compiler: ^1.0.0
-      oxc-transform-react: ^0.152.0
+      oxc-transform-react: '>=0.152.0 <0.157.0'
       vite: ^8.0.0
     peerDependenciesMeta:
       '@rolldown/plugin-babel':
@@ -1576,7 +1576,7 @@ snapshots:
 
   '@navikt/aksel-icons@8.21.0': {}
 
-  '@navikt/ds-css@8.20.1': {}
+  '@navikt/ds-css@8.21.0': {}
 
   '@navikt/ds-react@8.21.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
@@ -1755,7 +1755,7 @@ snapshots:
       '@typescript-eslint/types': 8.72.1
       eslint-visitor-keys: 5.0.1
 
-  '@vitejs/plugin-react@6.1.2(vite@8.3.5(esbuild@0.28.2))':
+  '@vitejs/plugin-react@6.2.1(vite@8.3.5(esbuild@0.28.2))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
       vite: 8.3.5(esbuild@0.28.2)
