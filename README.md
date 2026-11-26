@@ -20,6 +20,10 @@ Deretter kan man starte appen lokalt med kommandoen:
 
 `pnpm dev`
 
+For å kjøre uten tilgang til pensjon-regler (f.eks. uten naisdevice) kan man bruke mockdata:
+
+`pnpm dev:mock`
+
 Appen vil da åpnes i standard nettleseren på adressen *http://localhost:5137/*  
 med mindre denne porten er opptatt (Node vil da finne en annen ledig port)
 eller noe annet om spesifisert.
@@ -28,7 +32,8 @@ eller noe annet om spesifisert.
 
 `App.ts` er rot-komponenten for prosjektet. 
 
-Under satstabell-kategori komponentene ligger de respektive satstabellene.
+Alle satstabeller er definert i `src/config/tabeller.ts` (tittel, kategori, API-type og kolonner).
+Periodetabeller vises med `PeriodeTabell`, forholdstall og delingstall med `TallMatrise`.
 
 ## Bygg & Deploy
 Ved push til `main` bygges og deployes appen til prod-gcp. Endringene merges også til

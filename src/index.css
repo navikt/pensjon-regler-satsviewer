@@ -1,1 +1,289 @@
 @import "@navikt/ds-css";
+
+html, body {
+    margin: 0;
+    background: var(--ax-bg-default);
+}
+
+.app-theme-root {
+    min-height: 100vh;
+}
+
+.app-shell {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100vh;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.sentrert {
+    display: flex;
+    justify-content: center;
+    padding: var(--ax-space-32);
+}
+
+/* Header */
+
+.header-nav {
+    display: flex;
+    margin-left: var(--ax-space-16);
+}
+
+.header-nav a.active {
+    box-shadow: inset 0 -3px 0 var(--ax-border-accent);
+}
+
+.header-select {
+    gap: var(--ax-space-6);
+}
+
+.header-select-label {
+    opacity: 0.75;
+    font-weight: normal;
+}
+
+.header-select-value {
+    font-weight: 600;
+}
+
+/* Satssiden */
+
+.sats-layout {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    min-height: 0;
+}
+
+.sats-sidebar {
+    border-right: 1px solid var(--ax-border-neutral-subtle);
+    background: var(--ax-bg-neutral-soft);
+    overflow-y: auto;
+}
+
+.tabell-nav {
+    padding: var(--ax-space-16);
+}
+
+.tabell-nav-liste {
+    margin-top: var(--ax-space-16);
+}
+
+.tabell-nav-kategori {
+    color: var(--ax-text-neutral-subtle);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 var(--ax-space-4) var(--ax-space-8);
+}
+
+.tabell-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tabell-nav-lenke {
+    all: unset;
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    padding: var(--ax-space-6) var(--ax-space-8);
+    border-radius: var(--ax-radius-8);
+    cursor: pointer;
+    color: var(--ax-text-neutral);
+    font-size: var(--ax-font-size-medium);
+}
+
+.tabell-nav-lenke:hover {
+    background: var(--ax-bg-neutral-moderate-hover);
+}
+
+.tabell-nav-lenke:focus-visible {
+    outline: 3px solid var(--ax-border-focus);
+    outline-offset: -3px;
+}
+
+.tabell-nav-lenke[aria-current="page"] {
+    background: var(--ax-bg-accent-moderate);
+    color: var(--ax-text-accent);
+    font-weight: 600;
+}
+
+.sats-main {
+    overflow-y: auto;
+    min-width: 0;
+}
+
+.sats-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: var(--ax-space-12) var(--ax-space-32);
+    background: var(--ax-bg-default);
+    border-bottom: 1px solid var(--ax-border-neutral-subtle);
+}
+
+.sats-select {
+    min-width: 240px;
+}
+
+.sats-tag {
+    margin-bottom: var(--ax-space-6);
+}
+
+.sats-velger-skille {
+    width: 1px;
+    align-self: stretch;
+    background: var(--ax-border-neutral-subtle);
+}
+
+.sats-innhold {
+    padding: var(--ax-space-24) var(--ax-space-32) var(--ax-space-48);
+    max-width: 1400px;
+}
+
+.tabell-meta {
+    margin: var(--ax-space-16) 0 var(--ax-space-12);
+}
+
+.tall-info {
+    padding-bottom: var(--ax-space-6);
+}
+
+.kull-select {
+    min-width: 180px;
+}
+
+/* Tabeller */
+
+.tabell-ramme {
+    border: 1px solid var(--ax-border-neutral-subtle);
+    border-radius: var(--ax-radius-12);
+    overflow: auto;
+    background: var(--ax-bg-raised);
+}
+
+.sats-tabell {
+    font-variant-numeric: tabular-nums;
+}
+
+.sats-tabell thead th {
+    position: sticky;
+    top: 0;
+    background: var(--ax-bg-neutral-soft);
+    vertical-align: bottom;
+}
+
+.sats-tabell tbody tr:last-child > * {
+    border-bottom: none;
+}
+
+.celle-dato {
+    white-space: nowrap;
+}
+
+.celle-mono {
+    font-family: var(--ax-font-family-mono, monospace);
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+
+.tabell-tom {
+    padding: var(--ax-space-16);
+    color: var(--ax-text-neutral-subtle);
+}
+
+.tall-matrise tbody th {
+    white-space: nowrap;
+    background: var(--ax-bg-neutral-soft);
+}
+
+/* Gjeldende periode */
+
+.sats-tabell tr[data-gjeldende] > td {
+    background: var(--ax-bg-accent-soft);
+}
+
+.sats-tabell tr[data-gjeldende] > td:first-child {
+    box-shadow: inset 3px 0 0 var(--ax-border-accent);
+}
+
+/* Sammenligning */
+
+.sats-tabell tr[data-diff="ny"] > td {
+    background: var(--ax-bg-success-moderate);
+}
+
+.sats-tabell tr[data-diff="ny"] > td:first-child {
+    box-shadow: inset 3px 0 0 var(--ax-border-success);
+}
+
+.sats-tabell tr[data-diff="fjernet"] > td {
+    background: var(--ax-bg-danger-moderate);
+    color: var(--ax-text-neutral-subtle);
+    text-decoration: line-through;
+}
+
+.sats-tabell tr[data-diff="fjernet"] > td:first-child {
+    box-shadow: inset 3px 0 0 var(--ax-border-danger);
+}
+
+.sats-tabell tr[data-diff="endret"] > td:first-child {
+    box-shadow: inset 3px 0 0 var(--ax-border-warning);
+}
+
+.sats-tabell td.celle-endret {
+    background: var(--ax-bg-warning-moderate-pressed);
+    font-weight: 600;
+}
+
+.celle-gammel {
+    display: block;
+    font-weight: normal;
+    font-size: 0.8125rem;
+    color: var(--ax-text-neutral-subtle);
+    text-decoration: line-through;
+}
+
+/* Historikk */
+
+.side-smal {
+    padding: var(--ax-space-32);
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.historikk-sats {
+    display: inline-block;
+    font-weight: 600;
+    font-size: 1.125rem;
+    margin: var(--ax-space-4) 0;
+}
+
+@media (max-width: 800px) {
+    .sats-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+    }
+
+    .sats-sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--ax-border-neutral-subtle);
+        max-height: 40vh;
+    }
+
+    .sats-toolbar,
+    .sats-innhold {
+        padding-inline: var(--ax-space-16);
+    }
+}
