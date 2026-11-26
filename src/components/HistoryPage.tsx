@@ -1,106 +1,64 @@
-import { FC, useMemo, useState } from 'react';
-import { Alert, BodyShort, Box, Heading, HStack, Loader, Link, Page, Select, Table, Tag } from "@navikt/ds-react";
-import { SatsHistoryEntry } from '../service/SatsHistoryService';
-import { useSatsHistory } from '../service/useSatsHistory';
-import Header from './Header';
-import { isProduction } from '../utils/environment';
-import { useSearchParams } from 'react-router-dom';
+import {FC, useMemo} from "react";
+import {Alert, BodyShort, Box, Heading, HGrid, Link, Loader, Table, Tag, ToggleGroup, VStack} from "@navikt/ds-react";
+import {Link as RouterLink, useSearchParams} from "react-router-dom";
+import {SatsHistoryEntry} from "../service/SatsHistoryService";
+import {useSatsHistory} from "../service/useSatsHistory";
+import {formatTidspunkt} from "../utils/format";
 
-const ENVIRONMENTS = ['q1', 'q2', 'q5'];
-
-const environmentColors: Record<string, "info" | "success" | "warning" | "neutral"> = {
-    q1: 'info',
-    q2: 'success',
-    q5: 'neutral',
-};
-
-const formatDate = (iso: string): string => {
-    const date = new Date(iso);
-    return date.toLocaleDateString('nb-NO', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-    });
-};
+const MILJØER = ["q1", "q2", "q5"];
 
 const HistoryPage: FC = () => {
-    const [searchParams] = useSearchParams();
-    const initialEnv = searchParams.get('env');
-    const [selectedEnv, setSelectedEnv] = useState<string>(
-        initialEnv && ENVIRONMENTS.includes(initialEnv) ? initialEnv : 'alle'
+    const [params, setParams] = useSearchParams();
+    const miljøParam = params.get("miljo");
+    const valgtMiljø = miljøParam && MILJØER.includes(miljøParam) ? miljøParam : "alle";
+    const {data, isLoading, error} = useSatsHistory();
+
+    const filtrert = useMemo(
+        () => (data ?? []).filter((e) => valgtMiljø === "alle" || e.environment === valgtMiljø),
+        [data, valgtMiljø]
     );
-    const { data, isLoading, error } = useSatsHistory();
-    const isProd = isProduction();
 
-    const filteredData = useMemo(() => {
-        if (!data) return [];
-        if (selectedEnv === 'alle') return data;
-        return data.filter(entry => entry.environment === selectedEnv);
-    }, [data, selectedEnv]);
-
-    // Første entry per miljø (sortert nyest først) = nåværende aktiv satstabell
-    const currentSatsPerEnv = useMemo(() => {
-        if (!data) return new Map<string, SatsHistoryEntry>();
+    // Første entry per miljø (sortert nyest først) er satstabellen som er aktiv nå.
+    const nåværende = useMemo(() => {
         const map = new Map<string, SatsHistoryEntry>();
-        for (const entry of data) {
-            if (!map.has(entry.environment)) {
-                map.set(entry.environment, entry);
-            }
-        }
-        return map;
+        (data ?? []).forEach((e) => {
+            if (!map.has(e.environment)) map.set(e.environment, e);
+        });
+        return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
     }, [data]);
 
     return (
-        <Page>
-            <Header onChangedEnvironment={() => {}} isProduction={isProd} showHistoryLink={false} showBackLink={true} />
-            <Box padding="space-32" paddingBlock="space-64" as="main">
-                <Page.Block gutters width="2xl">
-                    <Heading size="large" spacing>Satshistorikk</Heading>
+        <main className="side-smal">
+            <VStack gap="space-24">
+                <div>
+                    <Heading level="2" size="large">Satshistorikk</Heading>
+                    <BodyShort textColor="subtle">Deploy av satstabeller til Q-miljøer, hentet fra GitHub Actions (siste 90 dager).</BodyShort>
+                </div>
 
-                    {currentSatsPerEnv.size > 0 && (
-                        <Box padding="space-16" borderRadius="12" background="sunken">
-                            <Heading size="small" spacing>Nåværende satstabell per miljø</Heading>
-                            <HStack gap="space-16" wrap>
-                                {[...currentSatsPerEnv.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([env, entry]) => (
-                                    <Tag key={env} variant={environmentColors[env] || 'neutral'} size="medium">
-                                        {env.toUpperCase()}: {entry.satstabell}
-                                    </Tag>
-                                ))}
-                            </HStack>
-                        </Box>
-                    )}
+                {nåværende.length > 0 && (
+                    <HGrid columns={{xs: 1, sm: 3}} gap="space-16">
+                        {nåværende.map(([miljø, entry]) => (
+                            <Box key={miljø} padding="space-16" borderRadius="12" background="sunken">
+                                <BodyShort size="small" textColor="subtle">Aktiv i {miljø.toUpperCase()}</BodyShort>
+                                <Link as={RouterLink} to={`/?miljo=${miljø}`} className="historikk-sats">{entry.satstabell}</Link>
+                                <BodyShort size="small" textColor="subtle">siden {formatTidspunkt(entry.timestamp)}</BodyShort>
+                            </Box>
+                        ))}
+                    </HGrid>
+                )}
 
-                    <Box paddingBlock="space-16">
-                        <Select
-                            label="Filtrer på miljø"
-                            size="small"
-                            value={selectedEnv}
-                            onChange={e => setSelectedEnv(e.target.value)}
-                            style={{ maxWidth: '200px' }}
-                        >
-                            <option value="alle">Alle miljøer</option>
-                            {ENVIRONMENTS.map(env => (
-                                <option key={env} value={env}>{env.toUpperCase()}</option>
-                            ))}
-                        </Select>
-                    </Box>
+                <ToggleGroup size="small" label="Miljø" value={valgtMiljø}
+                             onChange={(v) => setParams(v === "alle" ? {} : {miljo: v})}>
+                    <ToggleGroup.Item value="alle">Alle</ToggleGroup.Item>
+                    {MILJØER.map((m) => <ToggleGroup.Item key={m} value={m}>{m.toUpperCase()}</ToggleGroup.Item>)}
+                </ToggleGroup>
 
-                    {isLoading && (
-                        <Box padding="space-32" style={{ display: 'flex', justifyContent: 'center' }}>
-                            <Loader size="xlarge" title="Henter satshistorikk…" />
-                        </Box>
-                    )}
+                {isLoading && <div className="sentrert"><Loader size="xlarge" title="Henter satshistorikk …"/></div>}
+                {error && <Alert variant="error">Kunne ikke hente satshistorikk: {error.message}</Alert>}
 
-                    {error && (
-                        <Alert variant="error">
-                            Kunne ikke hente satshistorikk: {error.message}
-                        </Alert>
-                    )}
-
-                    {filteredData.length > 0 && (
-                        <Table size="small">
+                {filtrert.length > 0 && (
+                    <div className="tabell-ramme">
+                        <Table size="small" className="sats-tabell">
                             <BodyShort as="caption" visuallyHidden>Historikk over satstabeller deployet til Q-miljøer</BodyShort>
                             <Table.Header>
                                 <Table.Row>
@@ -112,44 +70,31 @@ const HistoryPage: FC = () => {
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {filteredData.map((entry, i) => (
-                                    <Table.Row key={`${entry.environment}-${entry.timestamp}-${i}`}>
-                                        <Table.DataCell>{formatDate(entry.timestamp)}</Table.DataCell>
+                                {filtrert.map((e, i) => (
+                                    <Table.Row key={`${e.environment}-${e.timestamp}-${i}`}>
+                                        <Table.DataCell className="celle-dato">{formatTidspunkt(e.timestamp)}</Table.DataCell>
+                                        <Table.DataCell><Tag variant="neutral" size="small">{e.environment.toUpperCase()}</Tag></Table.DataCell>
                                         <Table.DataCell>
-                                            <Tag variant={environmentColors[entry.environment] || 'neutral'} size="small">
-                                                {entry.environment.toUpperCase()}
-                                            </Tag>
+                                            <Link as={RouterLink} to={`/?miljo=${e.environment}&sats=${e.satstabell}`}>{e.satstabell}</Link>
                                         </Table.DataCell>
-                                        <Table.DataCell>
-                                            <strong>{entry.satstabell}</strong>
+                                        <Table.DataCell className="celle-mono">
+                                            {e.runId > 0
+                                                ? <Link href={`https://github.com/navikt/pensjon-regler/actions/runs/${e.runId}`} target="_blank">{e.version.substring(0, 30)}</Link>
+                                                : e.version}
                                         </Table.DataCell>
-                                        <Table.DataCell style={{ fontFamily: 'monospace', fontSize: '0.85em' }}>
-                                            {entry.runId > 0 ? (
-                                                <Link
-                                                    href={`https://github.com/navikt/pensjon-regler/actions/runs/${entry.runId}`}
-                                                    target="_blank"
-                                                >
-                                                    {entry.version.substring(0, 30)}
-                                                </Link>
-                                            ) : (
-                                                entry.version
-                                            )}
-                                        </Table.DataCell>
-                                        <Table.DataCell>{entry.actor}</Table.DataCell>
+                                        <Table.DataCell>{e.actor}</Table.DataCell>
                                     </Table.Row>
                                 ))}
                             </Table.Body>
                         </Table>
-                    )}
+                    </div>
+                )}
 
-                    {!isLoading && !error && filteredData.length === 0 && (
-                        <Alert variant="info">
-                            Ingen satshistorikk funnet. GitHub Actions-logger er kun tilgjengelig i 90 dager.
-                        </Alert>
-                    )}
-                </Page.Block>
-            </Box>
-        </Page>
+                {!isLoading && !error && filtrert.length === 0 && (
+                    <Alert variant="info">Ingen satshistorikk funnet. GitHub Actions-logger er kun tilgjengelig i 90 dager.</Alert>
+                )}
+            </VStack>
+        </main>
     );
 };
 
