@@ -1,60 +1,49 @@
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import {Satser, SatserType} from "../model";
-import { PROD_ENVIRONMENT } from "../utils/environment";
+import {useQuery} from "@tanstack/react-query";
+import {PROD_ENVIRONMENT} from "../utils/environment";
+import {MOCK_AKTIV, MOCK_SATSTABELLER, mockSatser} from "./mockData";
 
-const getBaseUrl = (environment: string): string => {
-    if (environment === PROD_ENVIRONMENT) {
-        return '';
-    }
-    return `https://pensjon-regler-${environment}.intern.dev.nav.no`;
+export const MOCK = import.meta.env.VITE_MOCK === "true";
+
+const getBaseUrl = (environment: string): string =>
+    environment === PROD_ENVIRONMENT ? "" : `https://pensjon-regler-${environment}.intern.dev.nav.no`;
+
+const forsinket = <T, >(verdi: T): Promise<T> => new Promise((resolve) => setTimeout(() => resolve(verdi), 300));
+
+const hent = async (url: string, accept: string) => {
+    const response = await fetch(url, {headers: {"Content-Type": accept, "Accept": accept}});
+    if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+    return response;
 };
 
-interface FetchResponse {
-    json: () => Promise<unknown>;
-    text: () => Promise<string>;
-}
-
-const fetchSatsByTabellByMiljøAndType = async (environment: string, type: string, satstabell: string): Promise<SatserType> => {
-    const response: FetchResponse = await fetch(`${getBaseUrl(environment)}/api/${type}?Satstabell=${satstabell}`,
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        });
-    const data = await response.json();
-    return { satser: data } as SatserType;
-
-}
-
-export const fetchAktivSatsTabellByMiljø = async (environment: string): Promise<string> => {
-    const response: FetchResponse = await fetch(`${getBaseUrl(environment)}/aktivTabell`,
-        {
-            headers: {
-                'Content-Type': 'application/text',
-                'Accept': 'application/text'
-            }
-        });
-    return response.text();
+const hentAktivSatstabell = async (environment: string): Promise<string> => {
+    if (MOCK) return forsinket(MOCK_AKTIV[environment] ?? MOCK_SATSTABELLER[0]);
+    return (await hent(`${getBaseUrl(environment)}/aktivTabell`, "application/text")).text();
 };
 
-export const fetchAlleSatstabellerByMiljø = async (environment: string): Promise<Satser> => {
-    const response: FetchResponse = await fetch(`${getBaseUrl(environment)}/alleSatstabeller`,
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        });
+const hentAlleSatstabeller = async (environment: string): Promise<string[]> => {
+    if (MOCK) return forsinket(MOCK_SATSTABELLER);
+    return (await hent(`${getBaseUrl(environment)}/alleSatstabeller`, "application/json")).json();
+};
 
-    const data = await response.json()
+const hentSatser = async <T, >(environment: string, type: string, satstabell: string): Promise<T[]> => {
+    if (MOCK) return forsinket(mockSatser(type, satstabell) as T[]);
+    return (await hent(`${getBaseUrl(environment)}/api/${type}?Satstabell=${encodeURIComponent(satstabell)}`, "application/json")).json();
+};
 
-    return { satser: data } as Satser;
+export const useAktivSatstabell = (environment: string) => useQuery({
+    queryKey: ["aktivTabell", environment],
+    queryFn: () => hentAktivSatstabell(environment),
+});
 
-}
+export const useAlleSatstabeller = (environment: string) => useQuery({
+    queryKey: ["alleSatstabeller", environment],
+    queryFn: () => hentAlleSatstabeller(environment),
+});
 
-export const useSatsTabellByMiljøAndType = (environment: string, type: string, satsTabell: string): UseQueryResult<SatserType, unknown> => useQuery({
-    queryKey: ['satsTabell', environment, type, satsTabell],
-    queryFn: () => fetchSatsByTabellByMiljøAndType(environment, type, satsTabell),
-    throwOnError: true,
+// Satser for en gitt satstabell endres ikke, så de kan caches lenge.
+export const useSatser = <T, >(environment: string, type: string, satstabell: string | undefined) => useQuery({
+    queryKey: ["satser", environment, type, satstabell],
+    queryFn: () => hentSatser<T>(environment, type, satstabell!),
+    enabled: !!satstabell,
+    staleTime: 10 * 60 * 1000,
 });
